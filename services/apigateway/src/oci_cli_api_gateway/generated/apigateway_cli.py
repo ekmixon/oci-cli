@@ -98,9 +98,7 @@ def change_api_compartment(ctx, from_json, wait_for_state, max_wait_seconds, wai
         kwargs['if_match'] = if_match
     kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
 
-    _details = {}
-    _details['compartmentId'] = compartment_id
-
+    _details = {'compartmentId': compartment_id}
     client = cli_util.build_client('apigateway', 'api_gateway', ctx)
     result = client.change_api_compartment(
         api_id=api_id,
@@ -119,7 +117,11 @@ def change_api_compartment(ctx, from_json, wait_for_state, max_wait_seconds, wai
                 if wait_interval_seconds is not None:
                     wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
 
-                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                click.echo(
+                    f'Action completed. Waiting until the work request has entered state: {wait_for_state}',
+                    file=sys.stderr,
+                )
+
                 result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
             except oci.exceptions.MaximumWaitTimeExceeded as e:
                 # If we fail, we should show an error, but we should still provide the information to the customer
@@ -154,9 +156,7 @@ def change_certificate_compartment(ctx, from_json, certificate_id, compartment_i
         kwargs['if_match'] = if_match
     kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
 
-    _details = {}
-    _details['compartmentId'] = compartment_id
-
+    _details = {'compartmentId': compartment_id}
     client = cli_util.build_client('apigateway', 'api_gateway', ctx)
     result = client.change_certificate_compartment(
         certificate_id=certificate_id,
@@ -188,12 +188,13 @@ Example: `{\"Operations\": {\"CostCenter\": \"42\"}}`""" + custom_types.cli_comp
 @cli_util.wrap_exceptions
 def create_api(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, compartment_id, display_name, freeform_tags, defined_tags, content):
 
-    kwargs = {}
-    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    kwargs = {
+        'opc_request_id': cli_util.use_or_generate_request_id(
+            ctx.obj['request_id']
+        )
+    }
 
-    _details = {}
-    _details['compartmentId'] = compartment_id
-
+    _details = {'compartmentId': compartment_id}
     if display_name is not None:
         _details['displayName'] = display_name
 
@@ -223,7 +224,11 @@ def create_api(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_s
                 if wait_interval_seconds is not None:
                     wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
 
-                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                click.echo(
+                    f'Action completed. Waiting until the work request has entered state: {wait_for_state}',
+                    file=sys.stderr,
+                )
+
                 result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
             except oci.exceptions.MaximumWaitTimeExceeded as e:
                 # If we fail, we should show an error, but we should still provide the information to the customer
@@ -263,13 +268,17 @@ Example: `{\"Operations\": {\"CostCenter\": \"42\"}}`""" + custom_types.cli_comp
 @cli_util.wrap_exceptions
 def create_certificate(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, compartment_id, private_key, certificate, display_name, intermediate_certificates, freeform_tags, defined_tags):
 
-    kwargs = {}
-    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    kwargs = {
+        'opc_request_id': cli_util.use_or_generate_request_id(
+            ctx.obj['request_id']
+        )
+    }
 
-    _details = {}
-    _details['compartmentId'] = compartment_id
-    _details['privateKey'] = private_key
-    _details['certificate'] = certificate
+    _details = {
+        'compartmentId': compartment_id,
+        'privateKey': private_key,
+        'certificate': certificate,
+    }
 
     if display_name is not None:
         _details['displayName'] = display_name
@@ -300,7 +309,11 @@ def create_certificate(ctx, from_json, wait_for_state, max_wait_seconds, wait_in
                 if wait_interval_seconds is not None:
                     wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
 
-                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                click.echo(
+                    f'Action completed. Waiting until the work request has entered state: {wait_for_state}',
+                    file=sys.stderr,
+                )
+
                 result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
             except oci.exceptions.MaximumWaitTimeExceeded as e:
                 # If we fail, we should show an error, but we should still provide the information to the customer
@@ -341,13 +354,13 @@ Example: `{\"configName\": \"configValue\"}`""" + custom_types.cli_complex_type.
 @cli_util.wrap_exceptions
 def create_sdk(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, target_language, api_id, display_name, freeform_tags, defined_tags, parameters):
 
-    kwargs = {}
-    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    kwargs = {
+        'opc_request_id': cli_util.use_or_generate_request_id(
+            ctx.obj['request_id']
+        )
+    }
 
-    _details = {}
-    _details['targetLanguage'] = target_language
-    _details['apiId'] = api_id
-
+    _details = {'targetLanguage': target_language, 'apiId': api_id}
     if display_name is not None:
         _details['displayName'] = display_name
 
@@ -377,7 +390,11 @@ def create_sdk(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_s
                 if wait_interval_seconds is not None:
                     wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
 
-                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                click.echo(
+                    f'Action completed. Waiting until the work request has entered state: {wait_for_state}',
+                    file=sys.stderr,
+                )
+
                 result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
             except oci.exceptions.MaximumWaitTimeExceeded as e:
                 # If we fail, we should show an error, but we should still provide the information to the customer
@@ -431,7 +448,11 @@ def delete_api(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_s
                 if wait_interval_seconds is not None:
                     wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
 
-                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                click.echo(
+                    f'Action completed. Waiting until the work request has entered state: {wait_for_state}',
+                    file=sys.stderr,
+                )
+
                 result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
             except oci.exceptions.MaximumWaitTimeExceeded as e:
                 # If we fail, we should show an error, but we should still provide the information to the customer
@@ -485,7 +506,11 @@ def delete_certificate(ctx, from_json, wait_for_state, max_wait_seconds, wait_in
                 if wait_interval_seconds is not None:
                     wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
 
-                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                click.echo(
+                    f'Action completed. Waiting until the work request has entered state: {wait_for_state}',
+                    file=sys.stderr,
+                )
+
                 result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
             except oci.exceptions.MaximumWaitTimeExceeded as e:
                 # If we fail, we should show an error, but we should still provide the information to the customer
@@ -539,7 +564,11 @@ def delete_sdk(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_s
                 if wait_interval_seconds is not None:
                     wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
 
-                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                click.echo(
+                    f'Action completed. Waiting until the work request has entered state: {wait_for_state}',
+                    file=sys.stderr,
+                )
+
                 result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
             except oci.exceptions.MaximumWaitTimeExceeded as e:
                 # If we fail, we should show an error, but we should still provide the information to the customer
@@ -567,8 +596,12 @@ def get_api(ctx, from_json, api_id):
     if isinstance(api_id, six.string_types) and len(api_id.strip()) == 0:
         raise click.UsageError('Parameter --api-id cannot be whitespace or empty string')
 
-    kwargs = {}
-    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    kwargs = {
+        'opc_request_id': cli_util.use_or_generate_request_id(
+            ctx.obj['request_id']
+        )
+    }
+
     client = cli_util.build_client('apigateway', 'api_gateway', ctx)
     result = client.get_api(
         api_id=api_id,
@@ -687,8 +720,12 @@ def get_certificate(ctx, from_json, certificate_id):
     if isinstance(certificate_id, six.string_types) and len(certificate_id.strip()) == 0:
         raise click.UsageError('Parameter --certificate-id cannot be whitespace or empty string')
 
-    kwargs = {}
-    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    kwargs = {
+        'opc_request_id': cli_util.use_or_generate_request_id(
+            ctx.obj['request_id']
+        )
+    }
+
     client = cli_util.build_client('apigateway', 'api_gateway', ctx)
     result = client.get_certificate(
         certificate_id=certificate_id,
@@ -709,8 +746,12 @@ def get_sdk(ctx, from_json, sdk_id):
     if isinstance(sdk_id, six.string_types) and len(sdk_id.strip()) == 0:
         raise click.UsageError('Parameter --sdk-id cannot be whitespace or empty string')
 
-    kwargs = {}
-    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    kwargs = {
+        'opc_request_id': cli_util.use_or_generate_request_id(
+            ctx.obj['request_id']
+        )
+    }
+
     client = cli_util.build_client('apigateway', 'api_gateway', ctx)
     result = client.get_sdk(
         sdk_id=sdk_id,
@@ -998,10 +1039,14 @@ def update_api(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_int
 
     if isinstance(api_id, six.string_types) and len(api_id.strip()) == 0:
         raise click.UsageError('Parameter --api-id cannot be whitespace or empty string')
-    if not force:
-        if freeform_tags or defined_tags:
-            if not click.confirm("WARNING: Updates to freeform-tags and defined-tags will replace any existing values. Are you sure you want to continue?"):
-                ctx.abort()
+    if (
+        not force
+        and (freeform_tags or defined_tags)
+        and not click.confirm(
+            "WARNING: Updates to freeform-tags and defined-tags will replace any existing values. Are you sure you want to continue?"
+        )
+    ):
+        ctx.abort()
 
     kwargs = {}
     if if_match is not None:
@@ -1040,7 +1085,11 @@ def update_api(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_int
                 if wait_interval_seconds is not None:
                     wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
 
-                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                click.echo(
+                    f'Action completed. Waiting until the work request has entered state: {wait_for_state}',
+                    file=sys.stderr,
+                )
+
                 result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
             except oci.exceptions.MaximumWaitTimeExceeded as e:
                 # If we fail, we should show an error, but we should still provide the information to the customer
@@ -1081,10 +1130,14 @@ def update_certificate(ctx, from_json, force, wait_for_state, max_wait_seconds, 
 
     if isinstance(certificate_id, six.string_types) and len(certificate_id.strip()) == 0:
         raise click.UsageError('Parameter --certificate-id cannot be whitespace or empty string')
-    if not force:
-        if freeform_tags or defined_tags:
-            if not click.confirm("WARNING: Updates to freeform-tags and defined-tags will replace any existing values. Are you sure you want to continue?"):
-                ctx.abort()
+    if (
+        not force
+        and (freeform_tags or defined_tags)
+        and not click.confirm(
+            "WARNING: Updates to freeform-tags and defined-tags will replace any existing values. Are you sure you want to continue?"
+        )
+    ):
+        ctx.abort()
 
     kwargs = {}
     if if_match is not None:
@@ -1120,7 +1173,11 @@ def update_certificate(ctx, from_json, force, wait_for_state, max_wait_seconds, 
                 if wait_interval_seconds is not None:
                     wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
 
-                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                click.echo(
+                    f'Action completed. Waiting until the work request has entered state: {wait_for_state}',
+                    file=sys.stderr,
+                )
+
                 result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
             except oci.exceptions.MaximumWaitTimeExceeded as e:
                 # If we fail, we should show an error, but we should still provide the information to the customer
@@ -1158,10 +1215,14 @@ def update_sdk(ctx, from_json, force, sdk_id, display_name, freeform_tags, defin
 
     if isinstance(sdk_id, six.string_types) and len(sdk_id.strip()) == 0:
         raise click.UsageError('Parameter --sdk-id cannot be whitespace or empty string')
-    if not force:
-        if freeform_tags or defined_tags:
-            if not click.confirm("WARNING: Updates to freeform-tags and defined-tags will replace any existing values. Are you sure you want to continue?"):
-                ctx.abort()
+    if (
+        not force
+        and (freeform_tags or defined_tags)
+        and not click.confirm(
+            "WARNING: Updates to freeform-tags and defined-tags will replace any existing values. Are you sure you want to continue?"
+        )
+    ):
+        ctx.abort()
 
     kwargs = {}
     if if_match is not None:

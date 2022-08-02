@@ -62,9 +62,7 @@ def change_gateway_compartment(ctx, from_json, wait_for_state, max_wait_seconds,
         kwargs['if_match'] = if_match
     kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
 
-    _details = {}
-    _details['compartmentId'] = compartment_id
-
+    _details = {'compartmentId': compartment_id}
     client = cli_util.build_client('apigateway', 'gateway', ctx)
     result = client.change_gateway_compartment(
         gateway_id=gateway_id,
@@ -83,7 +81,11 @@ def change_gateway_compartment(ctx, from_json, wait_for_state, max_wait_seconds,
                 if wait_interval_seconds is not None:
                     wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
 
-                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                click.echo(
+                    f'Action completed. Waiting until the work request has entered state: {wait_for_state}',
+                    file=sys.stderr,
+                )
+
                 result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
             except oci.exceptions.MaximumWaitTimeExceeded as e:
                 # If we fail, we should show an error, but we should still provide the information to the customer
@@ -109,7 +111,7 @@ Example: `PUBLIC` or `PRIVATE`""")
 
 Example: `My new resource`""")
 @cli_util.option('--certificate-id', help=u"""The [OCID] of the resource.""")
-@cli_util.option('--response-cache-details', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--response-cache-details', type=custom_types.CLI_COMPLEX_TYPE, help=f"""{custom_types.cli_complex_type.COMPLEX_TYPE_HELP}""")
 @cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Free-form tags for this resource. Each tag is a simple key-value pair with no predefined name, type, or namespace. For more information, see [Resource Tags].
 
 Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
@@ -126,13 +128,17 @@ Example: `{\"Operations\": {\"CostCenter\": \"42\"}}`""" + custom_types.cli_comp
 @cli_util.wrap_exceptions
 def create_gateway(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, compartment_id, endpoint_type, subnet_id, display_name, certificate_id, response_cache_details, freeform_tags, defined_tags):
 
-    kwargs = {}
-    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    kwargs = {
+        'opc_request_id': cli_util.use_or_generate_request_id(
+            ctx.obj['request_id']
+        )
+    }
 
-    _details = {}
-    _details['compartmentId'] = compartment_id
-    _details['endpointType'] = endpoint_type
-    _details['subnetId'] = subnet_id
+    _details = {
+        'compartmentId': compartment_id,
+        'endpointType': endpoint_type,
+        'subnetId': subnet_id,
+    }
 
     if display_name is not None:
         _details['displayName'] = display_name
@@ -166,7 +172,11 @@ def create_gateway(ctx, from_json, wait_for_state, max_wait_seconds, wait_interv
                 if wait_interval_seconds is not None:
                     wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
 
-                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                click.echo(
+                    f'Action completed. Waiting until the work request has entered state: {wait_for_state}',
+                    file=sys.stderr,
+                )
+
                 result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
             except oci.exceptions.MaximumWaitTimeExceeded as e:
                 # If we fail, we should show an error, but we should still provide the information to the customer
@@ -188,7 +198,7 @@ def create_gateway(ctx, from_json, wait_for_state, max_wait_seconds, wait_interv
 
 Example: `PUBLIC` or `PRIVATE`""")
 @cli_util.option('--subnet-id', required=True, help=u"""The [OCID] of the subnet in which related resources are created.""")
-@cli_util.option('--response-cache-details-servers', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""The set of cache store members to connect to. At present only a single server is supported.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--response-cache-details-servers', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=f"""The set of cache store members to connect to. At present only a single server is supported.{custom_types.cli_complex_type.COMPLEX_TYPE_HELP}""")
 @cli_util.option('--response-cache-details-authentication-secret-id', required=True, help=u"""The [OCID] of the Oracle Vault Service secret resource.""")
 @cli_util.option('--response-cache-details-authentication-secret-version-number', required=True, type=click.INT, help=u"""The version number of the authentication secret to use.""")
 @cli_util.option('--display-name', help=u"""A user-friendly name. Does not have to be unique, and it's changeable. Avoid entering confidential information.
@@ -216,14 +226,19 @@ Example: `{\"Operations\": {\"CostCenter\": \"42\"}}`""" + custom_types.cli_comp
 @cli_util.wrap_exceptions
 def create_gateway_external_resp_cache(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, compartment_id, endpoint_type, subnet_id, response_cache_details_servers, response_cache_details_authentication_secret_id, response_cache_details_authentication_secret_version_number, display_name, certificate_id, freeform_tags, defined_tags, response_cache_details_is_ssl_enabled, response_cache_details_is_ssl_verify_disabled, response_cache_details_connect_timeout_in_ms, response_cache_details_read_timeout_in_ms, response_cache_details_send_timeout_in_ms):
 
-    kwargs = {}
-    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    kwargs = {
+        'opc_request_id': cli_util.use_or_generate_request_id(
+            ctx.obj['request_id']
+        )
+    }
 
-    _details = {}
-    _details['responseCacheDetails'] = {}
-    _details['compartmentId'] = compartment_id
-    _details['endpointType'] = endpoint_type
-    _details['subnetId'] = subnet_id
+    _details = {
+        'responseCacheDetails': {},
+        'compartmentId': compartment_id,
+        'endpointType': endpoint_type,
+        'subnetId': subnet_id,
+    }
+
     _details['responseCacheDetails']['servers'] = cli_util.parse_json_parameter("response_cache_details_servers", response_cache_details_servers)
     _details['responseCacheDetails']['authenticationSecretId'] = response_cache_details_authentication_secret_id
     _details['responseCacheDetails']['authenticationSecretVersionNumber'] = response_cache_details_authentication_secret_version_number
@@ -274,7 +289,11 @@ def create_gateway_external_resp_cache(ctx, from_json, wait_for_state, max_wait_
                 if wait_interval_seconds is not None:
                     wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
 
-                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                click.echo(
+                    f'Action completed. Waiting until the work request has entered state: {wait_for_state}',
+                    file=sys.stderr,
+                )
+
                 result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
             except oci.exceptions.MaximumWaitTimeExceeded as e:
                 # If we fail, we should show an error, but we should still provide the information to the customer
@@ -316,14 +335,18 @@ Example: `{\"Operations\": {\"CostCenter\": \"42\"}}`""" + custom_types.cli_comp
 @cli_util.wrap_exceptions
 def create_gateway_no_cache(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, compartment_id, endpoint_type, subnet_id, display_name, certificate_id, freeform_tags, defined_tags):
 
-    kwargs = {}
-    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    kwargs = {
+        'opc_request_id': cli_util.use_or_generate_request_id(
+            ctx.obj['request_id']
+        )
+    }
 
-    _details = {}
-    _details['responseCacheDetails'] = {}
-    _details['compartmentId'] = compartment_id
-    _details['endpointType'] = endpoint_type
-    _details['subnetId'] = subnet_id
+    _details = {
+        'responseCacheDetails': {},
+        'compartmentId': compartment_id,
+        'endpointType': endpoint_type,
+        'subnetId': subnet_id,
+    }
 
     if display_name is not None:
         _details['displayName'] = display_name
@@ -356,7 +379,11 @@ def create_gateway_no_cache(ctx, from_json, wait_for_state, max_wait_seconds, wa
                 if wait_interval_seconds is not None:
                     wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
 
-                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                click.echo(
+                    f'Action completed. Waiting until the work request has entered state: {wait_for_state}',
+                    file=sys.stderr,
+                )
+
                 result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
             except oci.exceptions.MaximumWaitTimeExceeded as e:
                 # If we fail, we should show an error, but we should still provide the information to the customer
@@ -410,7 +437,11 @@ def delete_gateway(ctx, from_json, wait_for_state, max_wait_seconds, wait_interv
                 if wait_interval_seconds is not None:
                     wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
 
-                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                click.echo(
+                    f'Action completed. Waiting until the work request has entered state: {wait_for_state}',
+                    file=sys.stderr,
+                )
+
                 result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
             except oci.exceptions.MaximumWaitTimeExceeded as e:
                 # If we fail, we should show an error, but we should still provide the information to the customer

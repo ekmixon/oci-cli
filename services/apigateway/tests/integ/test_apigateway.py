@@ -346,121 +346,48 @@ def api_gateway_and_deployment(vcn_and_subnet, runner, config_file, config_profi
 def test_gateway_list(runner, config_file, config_profile):
     # TODO: remove this -- added this return on 8/16/2019 b/c tests were failing.
     return
-    params = [
-        'api-gateway', 'gateway', 'list',
-        '--compartment-id', util.COMPARTMENT_ID
-    ]
-
-    result = invoke(runner, config_file, config_profile, params)
-    util.validate_response(result)
-
-    api_gateways = json.loads(result.output)['data']['items']
-
-    assert len(api_gateways) > 0, "List API should return at least one gateway"
 
 
 # def test_deployment_list(api_gateway_and_deployment, runner, config_file, config_profile):
 def test_deployment_list(runner, config_file, config_profile):
     # TODO: remove this -- added this return on 8/16/2019 b/c tests were failing.
     return
-    params = [
-        'api-gateway', 'deployment', 'list',
-        '--compartment-id', util.COMPARTMENT_ID
-    ]
-
-    result = invoke(runner, config_file, config_profile, params)
-    util.validate_response(result)
-
-    api_deployments = json.loads(result.output)['data']['items']
-
-    assert len(api_deployments) > 0, "List API should return at least one deployment"
 
 
 # def test_gateway_update(api_gateway_and_deployment, runner, config_file, config_profile):
 def test_gateway_update(runner, config_file, config_profile):
     # TODO: remove this -- added this return on 8/16/2019 b/c tests were failing.
     return
-    api_gateway_id = api_gateway_and_deployment[0]
-    get_params = [
-        'api-gateway', 'gateway', 'get',
-        '--gateway-id', api_gateway_id
-    ]
-
-    result = invoke(runner, config_file, config_profile, get_params)
-    util.validate_response(result)
-    api_gateway = json.loads(result.output)['data']
-
-    params = [
-        'api-gateway', 'gateway', 'update',
-        '--gateway-id', api_gateway_id,
-        '--display-name', util.random_name('apigateway', insert_underscore=False),
-        '--force'
-    ]
-
-    update_result = invoke(runner, config_file, config_profile, params)
-    util.validate_response(update_result)
-
-    util.wait_until(['api-gateway', 'gateway', 'get', '--gateway-id', api_gateway_id], 'ACTIVE', max_wait_seconds=300)
-
-    result = invoke(runner, config_file, config_profile, get_params)
-    util.validate_response(result)
-    api_gateway_updated = json.loads(result.output)['data']
-
-    assert api_gateway['display-name'] != api_gateway_updated['display-name'], \
-        "API Gateway display name should have been updated"
 
 
 # def test_deployment_update(api_gateway_and_deployment, runner, config_file, config_profile):
 def test_deployment_update(runner, config_file, config_profile):
     # TODO: remove this -- added this return on 8/16/2019 b/c tests were failing.
     return
-    api_deployment_id = api_gateway_and_deployment[1]
-    fn_func_id = api_gateway_and_deployment[2]
-
-    get_params = [
-        'api-gateway', 'deployment', 'get',
-        '--deployment-id', api_deployment_id
-    ]
-
-    result = invoke(runner, config_file, config_profile, get_params)
-    util.validate_response(result)
-    api_deployment = json.loads(result.output)['data']
-
-    params = [
-        'api-gateway', 'deployment', 'update',
-        '--deployment-id', api_deployment_id,
-        '--display-name', util.random_name('deployment', insert_underscore=False),
-        '--specification', build_full_api_specification('https://cloud.oracle.com', fn_func_id, fn_func_id),
-        '--force'
-    ]
-
-    update_result = invoke(runner, config_file, config_profile, params)
-    util.validate_response(update_result)
-
-    util.wait_until(
-        ['api-gateway', 'deployment', 'get', '--deployment-id', api_deployment_id],
-        'ACTIVE',
-        max_wait_seconds=300)
-
-    result = invoke(runner, config_file, config_profile, get_params)
-    util.validate_response(result)
-    api_deployment_updated = json.loads(result.output)['data']
-
-    assert api_deployment['display-name'] != api_deployment_updated['display-name'], \
-        "Deployment's display name should have been updated"
-
-    assert json.dumps(api_deployment['specification']) != json.dumps(api_deployment_updated['specification']), \
-        "Deployment's specification should have been updated"
 
 
 def invoke(runner, config_file, config_profile, params, debug=False, root_params=None, strip_progress_bar=True, strip_multipart_stderr_output=True, ** args):
     root_params = root_params or []
-    if debug is True:
-        result = runner.invoke(oci_cli.cli, root_params + ['--debug', '--config-file', config_file, '--profile',
-                                                           config_profile] + params, **args)
-    else:
-        result = runner.invoke(oci_cli.cli,
-                               root_params + ['--config-file', config_file, '--profile', config_profile] + params,
-                               **args)
-
-    return result
+    return (
+        runner.invoke(
+            oci_cli.cli,
+            root_params
+            + [
+                '--debug',
+                '--config-file',
+                config_file,
+                '--profile',
+                config_profile,
+            ]
+            + params,
+            **args
+        )
+        if debug is True
+        else runner.invoke(
+            oci_cli.cli,
+            root_params
+            + ['--config-file', config_file, '--profile', config_profile]
+            + params,
+            **args
+        )
+    )

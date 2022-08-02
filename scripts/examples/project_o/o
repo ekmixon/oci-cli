@@ -145,7 +145,7 @@ def read_oci_commands_file():
     pathname = os.path.dirname(sys.argv[0])
     if not pathname:
         pathname = '.'
-    oci_commands_file = pathname + '/oci_commands'
+    oci_commands_file = f'{pathname}/oci_commands'
     if not os.path.isfile(oci_commands_file):
         oci_commands_file = os.path.expanduser('~/.oci/oci_commands')
 
@@ -158,7 +158,7 @@ def read_oci_commands_file():
                 global_options = line[line.find(' ')+1:]
 
     except FileNotFoundError:
-        print(bold('No ' + oci_commands_file + ' file.'))
+        print(bold(f'No {oci_commands_file} file.'))
         print('Create it with:\n')
         print(bold('    o oci_commands'))
         print('\nIt takes about two minutes.')
@@ -206,13 +206,11 @@ def get_from_oci_config(key):
         this_profile = ''
         with open(config_file, 'r') as f:
             for line in f:
-                m = re.search(r'^\[(.+)\]', line)
-                if m:
-                    this_profile = m.group(1)
+                if m := re.search(r'^\[(.+)\]', line):
+                    this_profile = m[1]
 
                 if this_profile in ('DEFAULT', profile):
-                    m = re.search(key, line)
-                    if m:
+                    if m := re.search(key, line):
                         value = line.split('=')[1].strip()
                         if this_profile == profile:
                             return value
@@ -235,7 +233,7 @@ def setup_ocids_file():
     if not (len(sys.argv) == 2 and re.search(
             'ocid1.tenancy.{50}', sys.argv[1])):
         # No ocid provide; offer help
-        print(bold('No ' + ocids_file_name + ' found.\n'))
+        print(bold(f'No {ocids_file_name}' + ' found.\n'))
         print("""To setup "o" just run:
   \033[1mo <your-tenancy-ocid> \033[0m
 
@@ -255,24 +253,38 @@ and I'll do this for you:
             oci_config_file = '/etc/oci/config'
 
         t = get_from_oci_config('tenancy')
-        print('Try:\n', bold('  o ' + t))
+        print('Try:\n', bold(f'  o {t}'))
 
     else:
         # <tenancy-ocid> provided... Let's roll!
-        print(bold('Setting up your ' + ocids_file_name + ' file:'))
-        if run_command(sys.argv[0] + ' -o name iam compartment get -c '
-                       + sys.argv[1] + ' go'):
+        print(bold(f'Setting up your {ocids_file_name} file:'))
+        if run_command(
+            (
+                (
+                    f'{sys.argv[0]} -o name iam compartment get -c '
+                    + sys.argv[1]
+                )
+                + ' go'
+            )
+        ):
             # compartment get on tenancy failed; try saving a stub for tenancy
             print("\nThat didn't work.  Creating a stub for tenancy root.")
             newids = {'root': {'type': 'tenancy',
                                'alias': 'root',
                                'id': sys.argv[1]}}
             ocids_file('write', newids)
-        run_command(sys.argv[0] + ' -o name iam ad list -c '
-                    + sys.argv[1] + ' go')
-        run_command(sys.argv[0] + ' -o name iam region list go')
-        run_command(sys.argv[0] + ' -o name iam compartment list -c '
-                    + sys.argv[1] + ' -ciis true -all go')
+        run_command(((f'{sys.argv[0]} -o name iam ad list -c ' + sys.argv[1]) + ' go'))
+        run_command(f'{sys.argv[0]} -o name iam region list go')
+        run_command(
+            (
+                (
+                    f'{sys.argv[0]} -o name iam compartment list -c '
+                    + sys.argv[1]
+                )
+                + ' -ciis true -all go'
+            )
+        )
+
         print('\n' + bold('All set. Have fun!\n'))
 
     exit(0)
@@ -323,11 +335,16 @@ def ocids_file(action, new_ocids={}):
                     fcntl.flock(f, fcntl.LOCK_EX | fcntl.LOCK_NB)
                 if new_ocids or action == 'read':
                     ocids = json.load(f)
-                    # Convert list of ocids into dict of ocids. Use id as key.
-                    ocid = {i['id']: i for i in ocids
-                            if 'availabilitydomain' != i['type']}
-                    ocid.update({i['name']: i for i in ocids
-                                 if 'availabilitydomain' == i['type']})
+                    ocid = {
+                        i['id']: i
+                        for i in ocids
+                        if i['type'] != 'availabilitydomain'
+                    } | {
+                        i['name']: i
+                        for i in ocids
+                        if i['type'] == 'availabilitydomain'
+                    }
+
             else:
                 os.umask(0o077)
                 f = open(ocids_file_name, 'w+')
@@ -361,22 +378,28 @@ def ocids_file(action, new_ocids={}):
 
         except IOError as e:
             if e.errno != errno.EAGAIN:
-                print(bold(ocids_file_name + ': not accessible'),
-                      file=sys.stderr)
+                print(bold(f'{ocids_file_name}: not accessible'), file=sys.stderr)
             f.close()
             time.sleep(0.05*2**tries)
             tries += 1
         except ValueError:
             # Try again
-            print(bold(ocids_file_name + ': JSON error on read - retry #' +
-                  str(tries)), file=sys.stderr)
+            print(
+                bold(
+                    (
+                        f'{ocids_file_name}: JSON error on read - retry #'
+                        + str(tries)
+                    )
+                ),
+                file=sys.stderr,
+            )
+
             f.close()
             time.sleep(0.05*tries)
             tries += 1
 
     if tries >= 10:
-        print(bold(ocids_file_name + ':  ' + action + ' failed'),
-              file=sys.stderr)
+        print(bold(f'{ocids_file_name}:  {action} failed'), file=sys.stderr)
 
     return
 
@@ -399,7 +422,7 @@ def get_new_ocids_from_returned_items(items):
 
     if oci_command_line.startswith('oci search'):
         for i in items:
-            if 'identifier' in i and not 'id' in i:
+            if 'identifier' in i and 'id' not in i:
                 i['id'] = i['identifier']
 
     if not items or 'id' not in items[0]:
@@ -453,7 +476,7 @@ def get_new_ocids_from_returned_items(items):
                 return({})
 
             if not alias:
-                alias = 'unnamed-' + type
+                alias = f'unnamed-{type}'
             collected[ID] = {'type': type, 'alias': alias, 'id': item['id']}
 
             # Now add various non-empty fields depending on item type
@@ -491,9 +514,19 @@ def get_new_ocids_from_returned_items(items):
             if type == 'par' and ID in ocid and 'access-uri' in ocid[ID]:
                 collected[ID]['access-uri'] = ocid[ID]['access-uri']
     except BaseException:
-        print(bold('Unable to collect ocids of type ' + type +
-                   '. Please provide this data with your problem report:\n')
-              + json.dumps(item, indent=4), file=sys.stderr)
+        print(
+            (
+                bold(
+                    (
+                        f'Unable to collect ocids of type {type}'
+                        + '. Please provide this data with your problem report:\n'
+                    )
+                )
+                + json.dumps(item, indent=4)
+            ),
+            file=sys.stderr,
+        )
+
 
     return collected
 
@@ -522,7 +555,7 @@ def parse_oci_command_options(line):
         [line, c['optional']] = line.split(' + ', 1)
     if ' --' in line:
         [c['action'], r] = line[4:].split(' --', 1)
-        c['required'] = '--' + r
+        c['required'] = f'--{r}'
     else:
         c['action'] = line[4:]
     return(c)
@@ -545,15 +578,15 @@ def args_match_command(c, params):
             return (True)
 
         # Look for full-word match first
-        if ' ' + a + ' ' in action:
+        if f' {a} ' in action:
             # Scratch out match
-            action = re.sub(' ' + a + ' ', ' ', action, count=1)
+            action = re.sub(f' {a} ', ' ', action, count=1)
             continue
 
         # look for word starting with arg
-        if ' ' + a in action:
+        if f' {a}' in action:
             # Scratch out this match
-            action = re.sub(' ' + a + r'\S+', ' ', action, count=1)
+            action = re.sub(f' {a}' + r'\S+', ' ', action, count=1)
             continue
 
         # look for rlc -> really-long-command
@@ -581,12 +614,10 @@ def option_parameter(arg):
     if a in ['c', 'cid']:
         a = 'compartment-id'
 
-    m = re.search('(--' + a + ') ', remaining_options)
-    if (m):
-        return m.group(1)
-    m = re.search('(--' + a + '[a-z-]*) ', remaining_options)
-    if (m):
-        return m.group(1)
+    if m := re.search(f'(--{a}) ', remaining_options):
+        return m[1]
+    if m := re.search(f'(--{a}[a-z-]*) ', remaining_options):
+        return m[1]
 
     # build a regex a[0] + a[1] + -a[1] + -a[2]... for -rlon
     multi_re = '-+' + r'\w+\-'.join(list(a[:-1]))
@@ -595,12 +626,7 @@ def option_parameter(arg):
         multi_re += 'd\\b'
     else:
         multi_re += r'\w+\-' + a[-1] + r'[\w-]+'
-    m = re.search(multi_re, remaining_options)
-    if m:
-        return m.group(0)
-
-    # Unable to expand; just go with what user provided
-    return arg
+    return m[0] if (m := re.search(multi_re, remaining_options)) else arg
 
 # ==============================================================================
 
@@ -613,7 +639,7 @@ def alias_match_score(spec, name):
         return 40 + len(spec)
     elif spec.lower() == name.lower():
         return 25 + len(spec)
-    elif re.match(spec+' ', name):
+    elif re.match(f'{spec} ', name):
         return 25 + int(200 * len(spec)/len(name))/10.0
     elif re.match(spec, name):
         return 20 + int(200 * len(spec)/len(name))/10.0
@@ -635,14 +661,15 @@ def get_item_parents(i):
     if i['compartment-id'] in ['', 'publisherCompartment']:
         return [i['alias']]
     if i['compartment-id'] in ocid:
-        if i['type'] == 'availabilitydomain':
-            return get_item_parents(ocid[i['compartment-id']]) + [i['name']]
-        else:
-            return get_item_parents(ocid[i['compartment-id']]) + [i['alias']]
-    else:
-        print(bold('Not found in ocids: ' + i['compartment-id']))
-        print(bold('Parent missing for ' + i['type'] + ' ' + i['alias']))
-        return [i['alias']]
+        return (
+            get_item_parents(ocid[i['compartment-id']]) + [i['name']]
+            if i['type'] == 'availabilitydomain'
+            else get_item_parents(ocid[i['compartment-id']]) + [i['alias']]
+        )
+
+    print(bold('Not found in ocids: ' + i['compartment-id']))
+    print(bold('Parent missing for ' + i['type'] + ' ' + i['alias']))
+    return [i['alias']]
 
 # ==============================================================================
 
@@ -684,11 +711,7 @@ def alias_match(spec, item):
                 # Otherwise deduct 20% from score as a penalty
                 item['score'] = int(item['score']*.8)
 
-    if item['score'] > 0:
-        # print ('X', item['type'], item['score'],
-        #        item['alias'], item['parents'])
-        return True
-    return False
+    return item['score'] > 0
 
 # ==============================================================================
 
@@ -699,7 +722,9 @@ def type_match(option, item_type):
     add it to the list of exceptions.
     """
 
-    if (option == item_type
+    return bool(
+        (
+            option == item_type
             or (option.startswith('compartment') and item_type == 'tenancy')
             or (option.startswith('tenant') and item_type == 'tenancy')
             or (option == 'ig' and item_type == 'internetgateway')
@@ -712,9 +737,9 @@ def type_match(option, item_type):
             or (option == 'dhcp' and item_type == 'dhcpoptions')
             or (option == 'application' and item_type == 'fnapp')
             or (option == 'function' and item_type == 'fnfunc')
-            or (option == 'avail' and len(item_type) == 1)):
-        return True
-    return False
+            or (option == 'avail' and len(item_type) == 1)
+        )
+    )
 
 # ==============================================================================
 
@@ -750,38 +775,38 @@ def datetime_parameter(dt):
     dts = dt
     # return time delta from now|today|yesterday
     m = re.search(r'(?P<day>now|today|yesterday) *(?P<delta>.*)', dt)
-    if m and m.group('day'):
-        if m.group(1) == 'now':
+    if m and m['day']:
+        if m[1] == 'now':
             time = datetime.datetime.utcnow()
-        elif m.group(1) in ('today', 'yesterday'):
+        elif m[1] in ('today', 'yesterday'):
             time = datetime.datetime.utcnow().replace(hour=0, minute=0,
                                                       second=0, microsecond=0)
-            if m.group(1) == 'yesterday':
+            if m[1] == 'yesterday':
                 time = time - datetime.timedelta(hours=24)
         dts = time.strftime('%Y-%m-%dT%H:%M:%S') + 'Z'
-    if m and m.group('delta'):
+    if m and m['delta']:
         deltas = {'s': 1, 'm': 60, 'h': 60*60, 'd': 60*60*24, 'w': 60*60*24*7}
-        m2 = re.search(r'(?P<s>[@+-]{,1})(?P<v>[\d:Z]*)(?P<u>[smhdw]{0,1})',
-                       m.group('delta'))
+        m2 = re.search(
+            r'(?P<s>[@+-]{,1})(?P<v>[\d:Z]*)(?P<u>[smhdw]{0,1})', m['delta']
+        )
+
         try:
             # optional time delta +/- <n> week/day/hour/minute/second
-            value = int(m2.group('v'))*deltas[m2.group('u')]
-            if m2.group('s') == '-':
+            value = int(m2['v']) * deltas[m2['u']]
+            if m2['s'] == '-':
                 value = value*-1
             time = time + datetime.timedelta(seconds=value)
             dts = time.strftime('%Y-%m-%dT%H:%M:%S') + 'Z'
         except (ValueError, KeyError):
-            dts = dts[:11] + m.group('delta')
-            if m.group('delta')[0] in '@+':
-                dts = dts[:11] + m.group('delta')[1:]
+            dts = dts[:11] + m['delta']
+            if m['delta'][0] in '@+':
+                dts = dts[:11] + m['delta'][1:]
             if dts[-1] != 'Z':
-                dts = dts + 'Z'
+                dts = f'{dts}Z'
 
     if dts.endswith('00:00:00Z'):
         return dts[:10]
-    if dts.endswith(':00Z'):
-        return dts[:16]+'Z'
-    return dts
+    return f'{dts[:16]}Z' if dts.endswith(':00Z') else dts
 
 # ==============================================================================
 
@@ -817,9 +842,11 @@ def get_region():
     if not r:
         return None,None
 
-    rmatch = [ i for i in ocid['regionlist']['data']
-          if r.upper() == i['key'] or r in i['name'] ]
-    if rmatch:
+    if rmatch := [
+        i
+        for i in ocid['regionlist']['data']
+        if r.upper() == i['key'] or r in i['name']
+    ]:
         return rmatch[0]['key'].lower(),rmatch[0]['name']
     return None,None
 
@@ -828,12 +855,8 @@ def get_region():
 
 def region_match(id):
     """Does ocid region match profile region?"""
-    region_from_id = (id+'....').split('.')[3]
-    if not region_code \
-            or region_from_id == '' \
-            or region_from_id == region_code:
-        return True
-    return False
+    region_from_id = f'{id}....'.split('.')[3]
+    return not region_code or region_from_id == '' or region_from_id == region_code
 
 # ==============================================================================
 
@@ -894,9 +917,8 @@ def value_parameter(option, value):
 
     # Get the parameter from help: --option [param_type]
     param_type = ''
-    m = re.search(option+r' \[([\w -\|]+?)\]', all_options_for_this_cmd)
-    if m:
-        param_type = m.group(1)
+    if m := re.search(option + r' \[([\w -\|]+?)\]', all_options_for_this_cmd):
+        param_type = m[1]
 
     # If option is an OCID, see if value matches any saved ocids
     if option.endswith('-id') or option == "--availability-domain":
@@ -925,9 +947,8 @@ def value_parameter(option, value):
     # Special help with log-search --search-query "search comp1 comp2 | ..."
     # Substitute compartment ocid for one or more values.
     if option == '--search-query':
-        m = re.search(r'search ([^|]+)', value)
-        if m:
-            for v in m.group(1).split():
+        if m := re.search(r'search ([^|]+)', value):
+            for v in m[1].split():
                 o = get_matching_ocid('compartment', v)
                 if o != v:
                     value = re.sub(v, '"'+o+'"', value)
@@ -985,9 +1006,8 @@ def get_fields_from(spec, keynames):
         s, fmt = sf, '{}'
         if s == '.':
             s = ''
-        m = re.search('(.*)({.*})', s)
-        if m:
-            s, fmt = m.group(1), m.group(2)
+        if m := re.search('(.*)({.*})', s):
+            s, fmt = m[1], m[2]
         if s in sorted(keynames):               # exact keyname match
             fields.append(s)
             column[s] = {'format': fmt, 'offset': 0, 'minwidth': len(s)}
@@ -999,9 +1019,9 @@ def get_fields_from(spec, keynames):
                         'format': fmt,
                         'offset': 0,
                         'minwidth': len(s)}
-    if len(fields) == 0:
+    if not fields:
         if user_out_spec != default_out_spec:
-            print(bold("no matching output fields: " + spec), file=sys.stderr)
+            print(bold(f"no matching output fields: {spec}"), file=sys.stderr)
         return(get_fields_from("/", keynames))
     return fields, sep
 
@@ -1012,7 +1032,7 @@ def set_column_widths(fields, item_list):
     global maxkeylen
     for k in fields:
         if ocids_in_output:
-            maxwidth = max([len(str(f[k])) for f in item_list])
+            maxwidth = max(len(str(f[k])) for f in item_list)
         else:
             maxwidth = 3
             for f in item_list:
@@ -1024,23 +1044,19 @@ def set_column_widths(fields, item_list):
         maxwidth = max([maxwidth, column[k]['minwidth']])
         column[k]['maxwidth'] = maxwidth
 
-        # if {:.<prec>} with no width, set width to min(maxwidth, <prec>)
-        m = re.search(r':[<^>]*\.(\d+)', column[k]['format'])
-        if m:
-            n = min(maxwidth, int(m.group(1)))
-            s = column[k]['format'][0:column[k]['format'].index('.')]
+        if m := re.search(r':[<^>]*\.(\d+)', column[k]['format']):
+            n = min(maxwidth, int(m[1]))
+            s = column[k]['format'][:column[k]['format'].index('.')]
             column[k]['format'] = s + str(n) + '.' + str(n) + '}'
 
-        # if right-aligned and truncated, output right-most characters
-        m = re.search(r'>.*\.(\d+)', column[k]['format'])
-        if m:
-            column[k]['offset'] = -1 * int(m.group(1))
+        if m := re.search(r'>.*\.(\d+)', column[k]['format']):
+            column[k]['offset'] = -1 * int(m[1])
         if column[k]['format'] == '{}' \
                 and out_sep == '|' \
                 and k is not fields[-1]:
             column[k]['format'] = '{:<' + \
                 str(maxwidth) + '.' + str(maxwidth) + '}'
-    maxkeylen = max([len(str(k)) for k in fields])
+    maxkeylen = max(len(str(k)) for k in fields)
     # keyfmt - with of longest field name, for raw text output
     column['keyfmt'] = '{:>' + str(maxkeylen) + '}'
     return

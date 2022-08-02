@@ -632,7 +632,7 @@ def sign_and_upload_container_image_signature_metadata(ctx, from_json, kms_key_i
     click.echo("Generating signature")
     signed_data = sign_container_image(
         kms_crypto_client, encoded_json, kms_key_id, kms_key_version_id, signing_algo_kms)
-    click.echo("Signature: " + signed_data.signature)
+    click.echo(f"Signature: {signed_data.signature}")
 
     # Upload signature metadata
     click.echo("Uploading signature")
@@ -640,7 +640,14 @@ def sign_and_upload_container_image_signature_metadata(ctx, from_json, kms_key_i
                                                                    image_id, kms_key_id, kms_key_version_id,
                                                                    signing_algo_ocir,
                                                                    encoded_json, signed_data.signature)
-    click.echo("Uploaded signature: " + container_image_signature_uploaded.data.signature + "\nMessage: " + container_image_signature_uploaded.data.message + "\nID: " + container_image_signature_uploaded.data.id)
+    click.echo(
+        f"Uploaded signature: {container_image_signature_uploaded.data.signature}"
+        + "\nMessage: "
+        + container_image_signature_uploaded.data.message
+        + "\nID: "
+        + container_image_signature_uploaded.data.id
+    )
+
     cli_util.render_response(container_image_signature_uploaded, ctx)
 
 
@@ -689,7 +696,7 @@ def get_and_verify_image_signature_metadata_helper(ctx, artifacts_client, region
     if len(container_image_signature_summaries) == 0:
         raise Exception("No signature in the image was signed by the supplied trusted keys")
     num = len(signature_collection.items) - len(container_image_signature_summaries)
-    click.echo("Filtered out " + str(num) + " signatures by the trusted keys")
+    click.echo(f"Filtered out {str(num)} signatures by the trusted keys")
 
     # Verify signature
     click.echo("Verifying signature")
@@ -737,7 +744,10 @@ def upload_signature_metadata(ctx, artifacts_client, compartment_id, image_id, k
     )
 
     if response.status != 200:
-        raise click.ClickException("Failed to upload the signature to OCI Registry. Status code: " + response.status)
+        raise click.ClickException(
+            f"Failed to upload the signature to OCI Registry. Status code: {response.status}"
+        )
+
     return response
 
 
@@ -750,12 +760,13 @@ def build_vault_crypto_client(ctx, key_id, region):
     realm = oci.regions.REGION_REALMS.get(region)
     second_level_domain = oci.regions.REALMS[realm]
     # region example: us-phoenix-1
-    crypto_endpoint = "https://" + vault_ext + "-crypto.kms." + region + "." + second_level_domain
+    crypto_endpoint = (
+        f"https://{vault_ext}-crypto.kms.{region}.{second_level_domain}"
+    )
+
     ctx.obj['endpoint'] = crypto_endpoint
 
-    # Build kms_crypto client
-    kms_crypto_client = cli_util.build_client("key_management", "kms_crypto", ctx)
-    return kms_crypto_client
+    return cli_util.build_client("key_management", "kms_crypto", ctx)
 
 
 def list_container_image_signatures_with_repo_path(artifacts_client, compartment_id, compartment_id_in_subtree,
@@ -775,18 +786,13 @@ def list_container_image_signatures_with_repo_path(artifacts_client, compartment
 
 
 def is_trusted_key(key, trusted_keys):
-    for k in trusted_keys:
-        if k == key:
-            return True
-    return False
+    return any(k == key for k in trusted_keys)
 
 
 def filter_item_by_trusted_keys(items, trusted_keys):
-    ret = []
-    for item in items:
-        if is_trusted_key(item.kms_key_id, trusted_keys):
-            ret.append(item)
-    return ret
+    return [
+        item for item in items if is_trusted_key(item.kms_key_id, trusted_keys)
+    ]
 
 
 def verify_signatures(ctx, container_image_signature_summary, region_name):
@@ -839,7 +845,7 @@ def get_container_image_metadata(ctx, image_id, region):
     # Set endpoint
     realm = oci.regions.REGION_REALMS.get(region)
     second_level_domain = oci.regions.REALMS[realm]
-    ctx.obj['endpoint'] = "https://artifacts." + region + ".oci." + second_level_domain
+    ctx.obj['endpoint'] = f"https://artifacts.{region}.oci.{second_level_domain}"
     artifacts_client = cli_util.build_client("artifacts", "artifacts", ctx)
     container_image_response = artifacts_client.get_container_image(image_id)
     return artifacts_client, container_image_response.data

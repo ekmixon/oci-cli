@@ -20,8 +20,9 @@ def open_relative(*path):
 
 with open_relative("src", "oci_cli", "version.py") as fd:
     version = re.search(
-        r"^__version__\s*=\s*['\"]([^'\"]*)['\"]",
-        fd.read(), re.MULTILINE).group(1)
+        r"^__version__\s*=\s*['\"]([^'\"]*)['\"]", fd.read(), re.MULTILINE
+    )[1]
+
     if not version:
         raise RuntimeError("Cannot find version information")
 
@@ -47,17 +48,19 @@ extras = {
     'db': ['cx_Oracle==7.0']
 }
 
-fips_libcrypto_file = os.getenv("OCI_CLI_FIPS_LIBCRYPTO_FILE")
-if fips_libcrypto_file:
+if fips_libcrypto_file := os.getenv("OCI_CLI_FIPS_LIBCRYPTO_FILE"):
     from setuptools.command.easy_install import ScriptWriter
     with open('src/oci_cli/oci_template.py', 'r') as template_file:
         template = template_file.read()
         ScriptWriter.template = template
 
 ALL_SERVICES_DIR = "services"
-package_dirs = {"": "src"}
 all_packages = find_packages(where="src")
-package_dirs[ALL_SERVICES_DIR] = os.path.join('.', ALL_SERVICES_DIR)
+package_dirs = {
+    "": "src",
+    ALL_SERVICES_DIR: os.path.join('.', ALL_SERVICES_DIR),
+}
+
 all_packages.extend([ALL_SERVICES_DIR])
 
 # Populating package_dirs and all_packages from directories under services

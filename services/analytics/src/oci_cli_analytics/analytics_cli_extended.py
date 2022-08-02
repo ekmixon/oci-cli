@@ -66,19 +66,13 @@ def create_analytics_instance_extended(ctx, **kwargs):
 @cli_util.wrap_exceptions
 def create_vanity_url_extended(ctx, **kwargs):
 
-    # Set "--private-key" to the content of file "--private-key-file"
-    private_key_file = kwargs.get('private_key_file')
-    if private_key_file:
+    if private_key_file := kwargs.get('private_key_file'):
         kwargs['private_key'] = private_key_file.read()
 
-    # Set "--public-certificate" to the content of file "--public-certificate-file"
-    public_certificate_file = kwargs.get('public_certificate_file')
-    if public_certificate_file:
+    if public_certificate_file := kwargs.get('public_certificate_file'):
         kwargs['public_certificate'] = public_certificate_file.read()
 
-    # Set "--ca-certificate" to the content of file "--ca-certificate-file"
-    ca_certificate_file = kwargs.get('ca_certificate_file')
-    if ca_certificate_file:
+    if ca_certificate_file := kwargs.get('ca_certificate_file'):
         kwargs['ca_certificate'] = ca_certificate_file.read()
 
     # Remove the extram parameters not expected on base method "create-vanity-url".
@@ -100,19 +94,13 @@ def create_vanity_url_extended(ctx, **kwargs):
 @cli_util.wrap_exceptions
 def update_vanity_url_extended(ctx, **kwargs):
 
-    # Set "--private-key" to the content of file "--private-key-file"
-    private_key_file = kwargs.get('private_key_file')
-    if private_key_file:
+    if private_key_file := kwargs.get('private_key_file'):
         kwargs['private_key'] = private_key_file.read()
 
-    # Set "--public-certificate" to the content of file "--public-certificate-file"
-    public_certificate_file = kwargs.get('public_certificate_file')
-    if public_certificate_file:
+    if public_certificate_file := kwargs.get('public_certificate_file'):
         kwargs['public_certificate'] = public_certificate_file.read()
 
-    # Set "--ca-certificate" to the content of file "--ca-certificate-file"
-    ca_certificate_file = kwargs.get('ca_certificate_file')
-    if ca_certificate_file:
+    if ca_certificate_file := kwargs.get('ca_certificate_file'):
         kwargs['ca_certificate'] = ca_certificate_file.read()
 
     # Remove the extram parameters not expected on base method "update-vanity-url".

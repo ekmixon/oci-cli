@@ -92,8 +92,12 @@ def get_work_request(ctx, from_json, work_request_id):
     if isinstance(work_request_id, six.string_types) and len(work_request_id.strip()) == 0:
         raise click.UsageError('Parameter --work-request-id cannot be whitespace or empty string')
 
-    kwargs = {}
-    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    kwargs = {
+        'opc_request_id': cli_util.use_or_generate_request_id(
+            ctx.obj['request_id']
+        )
+    }
+
     client = cli_util.build_client('apigateway', 'work_requests', ctx)
     result = client.get_work_request(
         work_request_id=work_request_id,

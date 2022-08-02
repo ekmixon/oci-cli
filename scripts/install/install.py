@@ -24,9 +24,7 @@ from urllib.request import urlopen
 from urllib.error import URLError
 
 
-sudo_cmd = 'sudo'
-if os.geteuid() == 0:
-    sudo_cmd = ""
+sudo_cmd = "" if os.geteuid() == 0 else 'sudo'
 
 
 def is_windows():
@@ -75,8 +73,9 @@ optional_feature_list = ['db (will install cx_Oracle)']
 ACCEPT_ALL_DEFAULTS = False
 
 VIRTUALENV_VERSION = '20.6.0'
-VIRTUALENV_ARCHIVE = 'virtualenv-{}.pyz'.format(VIRTUALENV_VERSION)
-VIRTUALENV_DOWNLOAD_URL = 'https://github.com/pypa/get-virtualenv/blob/{}/public/virtualenv.pyz?raw=true'.format(VIRTUALENV_VERSION)
+VIRTUALENV_ARCHIVE = f'virtualenv-{VIRTUALENV_VERSION}.pyz'
+VIRTUALENV_DOWNLOAD_URL = f'https://github.com/pypa/get-virtualenv/blob/{VIRTUALENV_VERSION}/public/virtualenv.pyz?raw=true'
+
 VIRTUALENV_ARCHIVE_SHA256 = 'a5d9b1f27bc790423f7910876c0e46cf476044f4ebd76d29dc6c06a3ab019e93'
 
 
@@ -99,7 +98,7 @@ class CLIInstallError(Exception):
 
 
 def print_status(msg=''):
-    print('-- ' + msg)
+    print(f'-- {msg}')
 
 
 def prompt_input(msg):
@@ -111,9 +110,9 @@ def prompt_input_with_default(msg, default):
         return default
 
     if default:
-        return prompt_input("{} (leave blank to use '{}'): ".format(msg, default)) or default
+        return prompt_input(f"{msg} (leave blank to use '{default}'): ") or default
     else:
-        return prompt_input('{}: '.format(msg))
+        return prompt_input(f'{msg}: ')
 
 
 def prompt_y_n(msg, default=None):
@@ -126,7 +125,7 @@ def prompt_y_n(msg, default=None):
         return default == y.lower()
 
     while True:
-        ans = prompt_input('{} ({}/{}): '.format(msg, y, n))
+        ans = prompt_input(f'{msg} ({y}/{n}): ')
         if ans.lower() == n.lower():
             return False
         if ans.lower() == y.lower():
@@ -136,18 +135,17 @@ def prompt_y_n(msg, default=None):
 
 
 def exec_command(command_list, cwd=None, env=None):
-    print_status('Executing: ' + str(command_list))
+    print_status(f'Executing: {str(command_list)}')
     subprocess.check_call(command_list, cwd=cwd, env=env)
 
 
 def create_tmp_dir():
-    tmp_dir = tempfile.mkdtemp()
-    return tmp_dir
+    return tempfile.mkdtemp()
 
 
 def create_dir(dir):
     if not os.path.isdir(dir):
-        print_status("Creating directory '{}'.".format(dir))
+        print_status(f"Creating directory '{dir}'.")
         os.makedirs(dir)
 
 
@@ -161,22 +159,21 @@ def is_valid_sha256sum(a_file, expected_sum):
 
 def download_and_create_virtualenv(tmp_dir, install_dir):
     download_location = os.path.join(tmp_dir, VIRTUALENV_ARCHIVE)
-    print_status('Downloading virtualenv package from {}.'.format(VIRTUALENV_DOWNLOAD_URL))
+    print_status(f'Downloading virtualenv package from {VIRTUALENV_DOWNLOAD_URL}.')
 
     try:
         response = urlopen(VIRTUALENV_DOWNLOAD_URL)
     except URLError as e:
-        if e.reason and isinstance(e.reason, ssl.SSLError):
-            traceback.print_exc()
-            sys.exit('ERROR: Failed to download virtualenv package. Please check that your trusted certificates are up to date and include the certificates necessary to verify github.com')
-        else:
+        if not e.reason or not isinstance(e.reason, ssl.SSLError):
             raise e
 
+        traceback.print_exc()
+        sys.exit('ERROR: Failed to download virtualenv package. Please check that your trusted certificates are up to date and include the certificates necessary to verify github.com')
     with open(download_location, 'wb') as f:
         f.write(response.read())
-    print_status("Downloaded virtualenv package to {}.".format(download_location))
+    print_status(f"Downloaded virtualenv package to {download_location}.")
     if is_valid_sha256sum(download_location, VIRTUALENV_ARCHIVE_SHA256):
-        print_status("Checksum of {} OK.".format(download_location))
+        print_status(f"Checksum of {download_location} OK.")
     else:
         raise CLIInstallError("The checksum of the downloaded virtualenv package does not match.")
     working_dir = tmp_dir
@@ -189,7 +186,7 @@ def download_and_create_virtualenv(tmp_dir, install_dir):
         os.makedirs(dest_dir)
         src_dir = os.path.dirname(sys.executable)
         for dll in glob.glob(os.path.join(src_dir, '*.dll')):
-            print_status('Copying {} to {}'.format(dll, dest_dir))
+            print_status(f'Copying {dll} to {dest_dir}')
             shutil.copy(dll, dest_dir)
     cmd = [sys.executable, VIRTUALENV_ARCHIVE, install_dir]
     exec_command(cmd, cwd=working_dir)
@@ -198,14 +195,14 @@ def download_and_create_virtualenv(tmp_dir, install_dir):
 def install_python3_venv():
     cmd = [sudo_cmd, 'apt-get', 'update']
     if DRY_RUN:
-        print_status('dry-run: Skipping apt-get update, cmd=' + str(cmd))
+        print_status(f'dry-run: Skipping apt-get update, cmd={cmd}')
     else:
         exec_command(cmd)
 
     print_status('Installing python3-venv.')
     cmd = [sudo_cmd, 'apt-get', 'install', 'python3-venv', '-y']
     if DRY_RUN:
-        print_status('dry-run: Skipping apt-get install python3-venv, cmd=' + str(cmd))
+        print_status(f'dry-run: Skipping apt-get install python3-venv, cmd={cmd}')
     else:
         exec_command(cmd)
 
@@ -216,32 +213,26 @@ def upgrade_pip_wheel(tmp_dir, install_dir):
 
         cmd = [path_to_python, '-m', 'pip', 'install', '--upgrade', 'pip']
         if DRY_RUN:
-            print_status('dry-run: Skipping pip upgrade, cmd=' + str(cmd))
+            print_status(f'dry-run: Skipping pip upgrade, cmd={cmd}')
         else:
             exec_command(cmd)
 
         path_to_pip = os.path.join(install_dir, 'Scripts', 'pip')
-
-        cmd = [path_to_pip, 'install', '--cache-dir', tmp_dir, 'wheel', '--upgrade']
-        if DRY_RUN:
-            print_status('dry-run: Skipping wheel upgrade, cmd=' + str(cmd))
-        else:
-            exec_command(cmd)
 
     else:
         path_to_pip = os.path.join(install_dir, 'bin', 'pip')
 
         cmd = [path_to_pip, 'install', '--upgrade', 'pip']
         if DRY_RUN:
-            print_status('dry-run: Skipping pip upgrade, cmd=' + str(cmd))
+            print_status(f'dry-run: Skipping pip upgrade, cmd={cmd}')
         else:
             exec_command(cmd)
 
-        cmd = [path_to_pip, 'install', '--cache-dir', tmp_dir, 'wheel', '--upgrade']
-        if DRY_RUN:
-            print_status('dry-run: Skipping wheel upgrade, cmd=' + str(cmd))
-        else:
-            exec_command(cmd)
+    cmd = [path_to_pip, 'install', '--cache-dir', tmp_dir, 'wheel', '--upgrade']
+    if DRY_RUN:
+        print_status(f'dry-run: Skipping wheel upgrade, cmd={cmd}')
+    else:
+        exec_command(cmd)
 
 
 def create_virtualenv(tmp_dir, install_dir):
@@ -293,15 +284,15 @@ def install_cli(install_dir, tmp_dir, version, optional_features):
     match_wheel = "oci_cli*.whl"
     cli_package_name = 'oci_cli'
     if version:
-        cli_package_name += '==' + version
-        match_wheel = "oci_cli*" + version + "*.whl"
-    if (optional_features):
-        cli_package_name += '[' + optional_features + ']'
+        cli_package_name += f'=={version}'
+        match_wheel = f"oci_cli*{version}*.whl"
+    if optional_features:
+        cli_package_name += f'[{optional_features}]'
 
     # Check if we should install a local full-install bundle.
     oci_cli_whl_files = glob.glob(match_wheel)
     if os.path.exists('./cli-deps') and len(oci_cli_whl_files) > 0:
-        print_status("Installing {} from local resources.".format(oci_cli_whl_files[0]))
+        print_status(f"Installing {oci_cli_whl_files[0]} from local resources.")
         cmd = [path_to_pip, 'install', '--cache-dir', tmp_dir, oci_cli_whl_files[0], '--upgrade', '--find-links', 'cli-deps']
 
     elif OFFLINE_INSTALL:
@@ -313,102 +304,116 @@ def install_cli(install_dir, tmp_dir, version, optional_features):
         cmd = [path_to_pip, 'install', '--cache-dir', tmp_dir, cli_package_name, '--upgrade']
 
     if DRY_RUN:
-        print_status('dry-run: Skipping CLI install, cmd=' + str(cmd))
+        print_status(f'dry-run: Skipping CLI install, cmd={str(cmd)}')
         return
     exec_command(cmd, env=env)
 
 
 def get_install_dir(allow_spaces):
     install_dir = None
+    prompt_message = 'In what directory would you like to place the install?'
     while not install_dir:
-        prompt_message = 'In what directory would you like to place the install?'
         install_dir = prompt_input_with_default(prompt_message, DEFAULT_INSTALL_DIR)
         install_dir = os.path.realpath(os.path.expanduser(install_dir))
         if ' ' in install_dir and not allow_spaces:
-            print_status("The install directory '{}' cannot contain spaces.".format(install_dir))
+            print_status(f"The install directory '{install_dir}' cannot contain spaces.")
             install_dir = None
         else:
             create_dir(install_dir)
             if os.listdir(install_dir):
-                print_status("Install directory '{}' is not empty and may contain a previous installation.".format(install_dir))
+                print_status(
+                    f"Install directory '{install_dir}' is not empty and may contain a previous installation."
+                )
+
                 if ACCEPT_ALL_DEFAULTS:
                     # default behavior is to NOT delete an existing directory and re-prompt for install_dir, but we can't re-prompt if ACCEPT_ALL_DEFAULTS is set
-                    sys.exit("Refusing to remove existing directory {}. Please remove directory manually and re-run installation script.".format(install_dir))
+                    sys.exit(
+                        f"Refusing to remove existing directory {install_dir}. Please remove directory manually and re-run installation script."
+                    )
 
-                ans_yes = prompt_y_n('Remove this directory?', 'n')
-                if ans_yes:
+
+                if ans_yes := prompt_y_n('Remove this directory?', 'n'):
                     try:
                         shutil.rmtree(install_dir)
                     except Exception:
-                        sys.exit("Failed to remove directory: {}. Please remove directory manually and re-run installation script.".format(install_dir))
+                        sys.exit(
+                            f"Failed to remove directory: {install_dir}. Please remove directory manually and re-run installation script."
+                        )
 
-                    print_status("Deleted '{}'.".format(install_dir))
+
+                    print_status(f"Deleted '{install_dir}'.")
                     create_dir(install_dir)
                 else:
                     # User opted to not delete the directory so ask for install directory again
                     install_dir = None
-    print_status("We will install at '{}'.".format(install_dir))
+    print_status(f"We will install at '{install_dir}'.")
     return install_dir
 
 
 def get_exec_dir(install_dir, allow_spaces):
     exec_dir = None
     while not exec_dir:
-        prompt_message = "In what directory would you like to place the '{}' executable?".format(OCI_EXECUTABLE_NAME)
+        prompt_message = f"In what directory would you like to place the '{OCI_EXECUTABLE_NAME}' executable?"
+
         exec_dir = prompt_input_with_default(prompt_message, DEFAULT_EXEC_DIR)
         exec_dir = os.path.realpath(os.path.expanduser(exec_dir))
         if ' ' in exec_dir and not allow_spaces:
-            print_status("The executable directory '{}' cannot contain spaces.".format(exec_dir))
+            print_status(f"The executable directory '{exec_dir}' cannot contain spaces.")
             exec_dir = None
             continue
 
         install_dir_bin_folder = 'Scripts' if is_windows() else 'bin'
         install_bin_dir = os.path.join(install_dir, install_dir_bin_folder)
         if exec_dir == install_bin_dir:
-            print_status("The executable directory cannot be the same as the {} directory of the virtualenv. Adding this directory to your PATH could interfere with your system python installation.".format(install_dir_bin_folder))
+            print_status(
+                f"The executable directory cannot be the same as the {install_dir_bin_folder} directory of the virtualenv. Adding this directory to your PATH could interfere with your system python installation."
+            )
+
             exec_dir = None
 
     create_dir(exec_dir)
-    print_status("The executable will be in '{}'.".format(exec_dir))
+    print_status(f"The executable will be in '{exec_dir}'.")
     return exec_dir
 
 
 def get_script_dir(install_dir, allow_spaces):
     script_dir = None
+    prompt_message = "In what directory would you like to place the OCI scripts?"
     while not script_dir:
-        prompt_message = "In what directory would you like to place the OCI scripts?"
         script_dir = prompt_input_with_default(prompt_message, DEFAULT_SCRIPT_DIR)
         script_dir = os.path.realpath(os.path.expanduser(script_dir))
         if ' ' in script_dir and not allow_spaces:
-            print_status("The script directory '{}' cannot contain spaces.".format(script_dir))
+            print_status(f"The script directory '{script_dir}' cannot contain spaces.")
             script_dir = None
             continue
 
         install_dir_bin_folder = 'Scripts' if is_windows() else 'bin'
         install_bin_dir = os.path.join(install_dir, install_dir_bin_folder)
         if script_dir == install_bin_dir:
-            print_status("The script directory cannot be the same as the {} directory of the virtualenv. Adding this directory to your PATH could interfere with your system python installation.".format(install_dir_bin_folder))
+            print_status(
+                f"The script directory cannot be the same as the {install_dir_bin_folder} directory of the virtualenv. Adding this directory to your PATH could interfere with your system python installation."
+            )
+
             script_dir = None
 
     create_dir(script_dir)
-    print_status("The scripts will be in '{}'.".format(script_dir))
+    print_status(f"The scripts will be in '{script_dir}'.")
     return script_dir
 
 
 def get_optional_features():
-    prompt_message = "Currently supported optional packages are: {}\n" \
-                     "What optional CLI packages would you like to be installed (comma separated names; press enter if " \
-                     "you don't need any optional packages)?".format(optional_feature_list)
+    prompt_message = f"Currently supported optional packages are: {optional_feature_list}\nWhat optional CLI packages would you like to be installed (comma separated names; press enter if you don't need any optional packages)?"
+
     optional_features = prompt_input_with_default(prompt_message, DEFAULT_OPTIONAL_FEATURES)
 
-    print_status("The optional packages installed will be '{}'.".format(optional_features))
+    print_status(f"The optional packages installed will be '{optional_features}'.")
     return optional_features
 
 
 def _backup_rc(rc_file):
     try:
-        shutil.copyfile(rc_file, rc_file + '.backup')
-        print_status("Backed up '{}' to '{}'".format(rc_file, rc_file + '.backup'))
+        shutil.copyfile(rc_file, f'{rc_file}.backup')
+        print_status(f"Backed up '{rc_file}' to '{rc_file}.backup'")
     except (OSError, IOError):
         pass
 
@@ -425,8 +430,10 @@ def _get_default_rc_file():
 
 def _default_rc_file_creation_step():
     rcfile = USER_BASH_PROFILE if platform.system().lower() == 'darwin' else USER_BASH_RC
-    ans_yes = prompt_y_n('Could not automatically find a suitable file to use. Create {} now?'.format(rcfile), default='y')
-    if ans_yes:
+    if ans_yes := prompt_y_n(
+        f'Could not automatically find a suitable file to use. Create {rcfile} now?',
+        default='y',
+    ):
         open(rcfile, 'a').close()
         return rcfile
     return None
@@ -450,15 +457,15 @@ def _modify_rc(rc_file_path, line_to_add):
 
 
 def get_rc_file_path():
-    rc_file = None
     default_rc_file = _get_default_rc_file()
-    if not default_rc_file:
-        rc_file = _default_rc_file_creation_step()
-    rc_file = rc_file or prompt_input_with_default('Enter a path to an rc file to update (file will be created if it does not exist)', default_rc_file)
-    if rc_file:
+    rc_file = None if default_rc_file else _default_rc_file_creation_step()
+    if rc_file := rc_file or prompt_input_with_default(
+        'Enter a path to an rc file to update (file will be created if it does not exist)',
+        default_rc_file,
+    ):
         rc_file_path = os.path.realpath(os.path.expanduser(rc_file))
         if not os.path.isfile(rc_file_path):
-            print_status("Automatically created rc file at '{}'".format(rc_file_path))
+            print_status(f"Automatically created rc file at '{rc_file_path}'")
         return rc_file_path
     return None
 
@@ -469,22 +476,29 @@ def warn_other_oci_on_path(exec_dir, exec_filepath):
     if env_path:
         for p in env_path.split(':'):
             p_to_oci = os.path.join(p, OCI_EXECUTABLE_NAME)
-            if p != exec_dir:
-                if os.path.isfile(p_to_oci):
-                    conflicting_paths.append(p_to_oci)
+            if p != exec_dir and os.path.isfile(p_to_oci):
+                conflicting_paths.append(p_to_oci)
     if conflicting_paths:
         print_status()
-        print_status("** WARNING: Other '{}' executables are on your $PATH. **".format(OCI_EXECUTABLE_NAME))
-        print_status("Conflicting paths: {}".format(', '.join(conflicting_paths)))
-        print_status("You can run this installation of the CLI with '{}'.".format(exec_filepath))
+        print_status(
+            f"** WARNING: Other '{OCI_EXECUTABLE_NAME}' executables are on your $PATH. **"
+        )
+
+        print_status(f"Conflicting paths: {', '.join(conflicting_paths)}")
+        print_status(
+            f"You can run this installation of the CLI with '{exec_filepath}'."
+        )
 
 
 def handle_path_and_tab_completion(completion_file_path, exec_filepath, exec_dir, update_path_and_enable_tab_completion,
                                    rc_file_path):
     if DRY_RUN:
         print_status("dry-run: Skipping handle_path_and_tab_completion")
-        print_status("dry-run: update_path_and_enable_tab_completion=" + str(update_path_and_enable_tab_completion))
-        print_status("dry-run: rc_file_path=" + str(rc_file_path))
+        print_status(
+            f"dry-run: update_path_and_enable_tab_completion={str(update_path_and_enable_tab_completion)}"
+        )
+
+        print_status(f"dry-run: rc_file_path={str(rc_file_path)}")
         return
     if is_windows():
         if update_path_and_enable_tab_completion:
@@ -499,7 +513,7 @@ def handle_path_and_tab_completion(completion_file_path, exec_filepath, exec_dir
                     os.makedirs(os.path.dirname(profile_file_path))
 
                 with open(profile_file_path, 'w') as f:
-                    f.write('. "{}"'.format(completion_file_path))
+                    f.write(f'. "{completion_file_path}"')
             else:
                 with open(profile_file_path, 'a+') as f:
                     current_file_contents = f.read()
@@ -516,19 +530,23 @@ def handle_path_and_tab_completion(completion_file_path, exec_filepath, exec_dir
                         print_status(format_str.format(profile_file_path=profile_file_path))
                     else:
                         # They don't have the tab completion script in their profile. Add it
-                        f.write('\n. "{}"\n'.format(completion_file_path))
+                        f.write(f'\n. "{completion_file_path}"\n')
 
             # powershell one-liner to append the exec_dir to the USER path permanently
             # makes the assumption that powershell is on the PATH already
-            command = "powershell -Command \"[Environment]::SetEnvironmentVariable(\\\"PATH\\\", \\\"{};\\\" + (Get-ItemProperty -Path 'Registry::HKEY_CURRENT_USER\Environment' -Name PATH).Path, \\\"User\\\")".format(exec_dir)  # noqa: W605
+            command = f"""powershell -Command \"[Environment]::SetEnvironmentVariable(\\\"PATH\\\", \\\"{exec_dir};\\\" + (Get-ItemProperty -Path 'Registry::HKEY_CURRENT_USER\Environment' -Name PATH).Path, \\\"User\\\")"""
+
             subprocess.check_output(command, stderr=subprocess.STDOUT, shell=True)
             print_status()
             print_status('** Close and re-open PowerShell to reload changes to your PATH **')
             print_status('In order to run the autocomplete script, you may also need to set your PowerShell execution policy to allow for running local scripts (as an Administrator run Set-ExecutionPolicy RemoteSigned in a PowerShell prompt)')
             print_status()
         else:
-            print_status("If you change your mind, dot source {} in your PowerShell profile and restart your shell to enable tab completion.".format(completion_file_path))
-            print_status("You can run the CLI with '{}'.".format(exec_filepath))
+            print_status(
+                f"If you change your mind, dot source {completion_file_path} in your PowerShell profile and restart your shell to enable tab completion."
+            )
+
+            print_status(f"You can run the CLI with '{exec_filepath}'.")
     else:
         if update_path_and_enable_tab_completion:
             ans_yes = True
@@ -540,19 +558,25 @@ def handle_path_and_tab_completion(completion_file_path, exec_filepath, exec_dir
             if not rc_file_path:
                 raise CLIInstallError('No suitable profile file found.')
             _backup_rc(rc_file_path)
-            line_to_add = "export PATH={}:$PATH".format(exec_dir)
+            line_to_add = f"export PATH={exec_dir}:$PATH"
             _modify_rc(rc_file_path, line_to_add)
             line_to_add = SOURCE_AUTOCOMPLETE_COMMAND_TEMPLATE.format(completion_file_path=completion_file_path)
             _modify_rc(rc_file_path, line_to_add)
             print_status('Tab completion set up complete.')
-            print_status("If tab completion is not activated, verify that '{}' is sourced by your shell.".format(rc_file_path))
+            print_status(
+                f"If tab completion is not activated, verify that '{rc_file_path}' is sourced by your shell."
+            )
+
             warn_other_oci_on_path(exec_dir, exec_filepath)
             print_status()
             print_status('** Run `exec -l $SHELL` to restart your shell. **')
             print_status()
         else:
-            print_status("If you change your mind, add 'source {}' to your rc file and restart your shell to enable tab completion.".format(completion_file_path))
-            print_status("You can run the CLI with '{}'.".format(exec_filepath))
+            print_status(
+                f"If you change your mind, add 'source {completion_file_path}' to your rc file and restart your shell to enable tab completion."
+            )
+
+            print_status(f"You can run the CLI with '{exec_filepath}'.")
 
 
 def verify_python_version():
@@ -564,12 +588,14 @@ def verify_python_version():
     if 'conda' in sys.version:
         raise CLIInstallError("This script does not support the Python Anaconda environment. "
                               "Create an Anaconda virtual environment and install with 'pip'")
-    print_status('Python version {}.{}.{} okay.'.format(v.major, v.minor, v.micro))
+    print_status(f'Python version {v.major}.{v.minor}.{v.micro} okay.')
 
 
 def verify_install_dir_exec_path_conflict(install_dir, exec_path):
     if install_dir == exec_path:
-        raise CLIInstallError("The executable file '{}' would clash with the install directory of '{}'. Choose either a different install directory or directory to place the executable.".format(exec_path, install_dir))
+        raise CLIInstallError(
+            f"The executable file '{exec_path}' would clash with the install directory of '{install_dir}'. Choose either a different install directory or directory to place the executable."
+        )
 
 
 # installed python3-dev as oci_cli[db] was failing on ubuntu 20.4
@@ -584,8 +610,7 @@ def install_native_dependencies_for_ubuntu():
     is_python3 = sys.version_info[0] == 3
     python_dep = 'python3-dev' if is_python3 else 'python-dev'
     dep_list = ['libssl-dev', 'libffi-dev', python_dep, 'build-essential']
-    cmd = [sudo_cmd, 'apt-get', '--assume-yes', 'install']
-    cmd.extend(dep_list)
+    cmd = [sudo_cmd, 'apt-get', '--assume-yes', 'install', *dep_list]
     exec_command(cmd)
 
 
@@ -640,9 +665,7 @@ def main():
     script_dir = args.script_dir
     verify_python_version()
     tmp_dir = create_tmp_dir()
-    allow_spaces = False    # on *nix systems, virtualenv pip does not work properly when there are spaces in the dir.
-    if is_windows():
-        allow_spaces = True
+    allow_spaces = bool(is_windows())
     if install_dir is None:
         install_dir = get_install_dir(allow_spaces)
     else:
@@ -677,8 +700,8 @@ def main():
 
     if DRY_RUN:
         print_status("dry-run: Skipping copying files to Scripts/bin directories.")
-        print_status("dry-run: exec_dir=" + exec_dir)
-        print_status("dry-run: script_dir=" + script_dir)
+        print_status(f"dry-run: exec_dir={exec_dir}")
+        print_status(f"dry-run: script_dir={script_dir}")
         completion_file_path = None
     elif is_windows():
         venv_python_executable = os.path.join(install_dir, 'Scripts', 'python')
@@ -709,18 +732,18 @@ def main():
         handle_path_and_tab_completion(completion_file_path, oci_exec_path, exec_dir,
                                        args.update_path_and_enable_tab_completion, args.rc_file_path)
     except Exception as e:
-        print_status("Unable to set up tab completion. ERROR: {}".format(str(e)))
+        print_status(f"Unable to set up tab completion. ERROR: {str(e)}")
 
     shutil.rmtree(tmp_dir)
     print_status("Installation successful.")
-    print_status("Run the CLI with {} --help".format(oci_exec_path))
+    print_status(f"Run the CLI with {oci_exec_path} --help")
 
 
 if __name__ == '__main__':
     try:
         main()
     except CLIInstallError as cie:
-        print('ERROR: ' + str(cie), file=sys.stderr)
+        print(f'ERROR: {str(cie)}', file=sys.stderr)
         sys.exit(1)
     except KeyboardInterrupt:
         print('\n\nExiting...')

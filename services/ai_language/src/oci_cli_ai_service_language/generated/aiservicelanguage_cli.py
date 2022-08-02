@@ -69,12 +69,13 @@ ai_root_group.add_command(detect_dominant_language_result_group)
 @cli_util.wrap_exceptions
 def detect_dominant_language(ctx, from_json, text):
 
-    kwargs = {}
-    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    kwargs = {
+        'opc_request_id': cli_util.use_or_generate_request_id(
+            ctx.obj['request_id']
+        )
+    }
 
-    _details = {}
-    _details['text'] = text
-
+    _details = {'text': text}
     client = cli_util.build_client('ai_language', 'ai_service_language', ctx)
     result = client.detect_dominant_language(
         detect_dominant_language_details=_details,
@@ -101,9 +102,7 @@ def detect_language_entities(ctx, from_json, text, model_version, is_pii):
         kwargs['is_pii'] = is_pii
     kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
 
-    _details = {}
-    _details['text'] = text
-
+    _details = {'text': text}
     client = cli_util.build_client('ai_language', 'ai_service_language', ctx)
     result = client.detect_language_entities(
         detect_language_entities_details=_details,
@@ -121,12 +120,13 @@ def detect_language_entities(ctx, from_json, text, model_version, is_pii):
 @cli_util.wrap_exceptions
 def detect_language_key_phrases(ctx, from_json, text):
 
-    kwargs = {}
-    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    kwargs = {
+        'opc_request_id': cli_util.use_or_generate_request_id(
+            ctx.obj['request_id']
+        )
+    }
 
-    _details = {}
-    _details['text'] = text
-
+    _details = {'text': text}
     client = cli_util.build_client('ai_language', 'ai_service_language', ctx)
     result = client.detect_language_key_phrases(
         detect_language_key_phrases_details=_details,
@@ -144,12 +144,13 @@ def detect_language_key_phrases(ctx, from_json, text):
 @cli_util.wrap_exceptions
 def detect_language_sentiments(ctx, from_json, text):
 
-    kwargs = {}
-    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    kwargs = {
+        'opc_request_id': cli_util.use_or_generate_request_id(
+            ctx.obj['request_id']
+        )
+    }
 
-    _details = {}
-    _details['text'] = text
-
+    _details = {'text': text}
     client = cli_util.build_client('ai_language', 'ai_service_language', ctx)
     result = client.detect_language_sentiments(
         detect_language_sentiments_details=_details,
@@ -167,12 +168,13 @@ def detect_language_sentiments(ctx, from_json, text):
 @cli_util.wrap_exceptions
 def detect_language_text_classification(ctx, from_json, text):
 
-    kwargs = {}
-    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    kwargs = {
+        'opc_request_id': cli_util.use_or_generate_request_id(
+            ctx.obj['request_id']
+        )
+    }
 
-    _details = {}
-    _details['text'] = text
-
+    _details = {'text': text}
     client = cli_util.build_client('ai_language', 'ai_service_language', ctx)
     result = client.detect_language_text_classification(
         detect_language_text_classification_details=_details,

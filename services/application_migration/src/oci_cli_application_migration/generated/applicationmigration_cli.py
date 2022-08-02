@@ -122,9 +122,7 @@ def change_migration_compartment(ctx, from_json, wait_for_state, max_wait_second
         kwargs['if_match'] = if_match
     kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
 
-    _details = {}
-    _details['compartmentId'] = compartment_id
-
+    _details = {'compartmentId': compartment_id}
     client = cli_util.build_client('application_migration', 'application_migration', ctx)
     result = client.change_migration_compartment(
         migration_id=migration_id,
@@ -141,7 +139,11 @@ def change_migration_compartment(ctx, from_json, wait_for_state, max_wait_second
                 if wait_interval_seconds is not None:
                     wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
 
-                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                click.echo(
+                    f'Action completed. Waiting until the work request has entered state: {wait_for_state}',
+                    file=sys.stderr,
+                )
+
                 result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
             except oci.exceptions.MaximumWaitTimeExceeded as e:
                 # If we fail, we should show an error, but we should still provide the information to the customer
@@ -179,9 +181,7 @@ def change_source_compartment(ctx, from_json, wait_for_state, max_wait_seconds, 
         kwargs['if_match'] = if_match
     kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
 
-    _details = {}
-    _details['compartmentId'] = compartment_id
-
+    _details = {'compartmentId': compartment_id}
     client = cli_util.build_client('application_migration', 'application_migration', ctx)
     result = client.change_source_compartment(
         source_id=source_id,
@@ -198,7 +198,11 @@ def change_source_compartment(ctx, from_json, wait_for_state, max_wait_seconds, 
                 if wait_interval_seconds is not None:
                     wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
 
-                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                click.echo(
+                    f'Action completed. Waiting until the work request has entered state: {wait_for_state}',
+                    file=sys.stderr,
+                )
+
                 result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
             except oci.exceptions.MaximumWaitTimeExceeded as e:
                 # If we fail, we should show an error, but we should still provide the information to the customer
@@ -226,7 +230,7 @@ To track the progress of this operation, you can monitor the status of the Creat
 @cli_util.option('--compartment-id', required=True, help=u"""The [OCID] of the compartment that contains the source.""")
 @cli_util.option('--source-id', required=True, help=u"""The [OCID] of the source.""")
 @cli_util.option('--application-name', required=True, help=u"""Name of the application that you want to migrate from the source environment.""")
-@cli_util.option('--discovery-details', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--discovery-details', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=f"""{custom_types.cli_complex_type.COMPLEX_TYPE_HELP}""")
 @cli_util.option('--display-name', help=u"""User-friendly name of the application. This will be the name of the migrated application in Oracle Cloud Infrastructure.""")
 @cli_util.option('--description', help=u"""Description of the application that you are migrating.""")
 @cli_util.option('--pre-created-target-database-type', type=custom_types.CliCaseInsensitiveChoice(["DATABASE_SYSTEM", "NOT_SET"]), help=u"""The pre-existing database type to be used in this migration. Currently, Application migration only supports Oracle Cloud Infrastructure databases and this option is currently available only for `JAVA_CLOUD_SERVICE` and `WEBLOGIC_CLOUD_SERVICE` target instance types.""")
@@ -249,14 +253,20 @@ This option is a JSON dictionary of type dict(str, ConfigurationField).  For doc
 @cli_util.wrap_exceptions
 def create_migration(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, compartment_id, source_id, application_name, discovery_details, display_name, description, pre_created_target_database_type, is_selective_migration, service_config, application_config, freeform_tags, defined_tags):
 
-    kwargs = {}
-    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    kwargs = {
+        'opc_request_id': cli_util.use_or_generate_request_id(
+            ctx.obj['request_id']
+        )
+    }
 
-    _details = {}
-    _details['compartmentId'] = compartment_id
-    _details['sourceId'] = source_id
-    _details['applicationName'] = application_name
-    _details['discoveryDetails'] = cli_util.parse_json_parameter("discovery_details", discovery_details)
+    _details = {
+        'compartmentId': compartment_id,
+        'sourceId': source_id,
+        'applicationName': application_name,
+        'discoveryDetails': cli_util.parse_json_parameter(
+            "discovery_details", discovery_details
+        ),
+    }
 
     if display_name is not None:
         _details['displayName'] = display_name
@@ -297,7 +307,11 @@ def create_migration(ctx, from_json, wait_for_state, max_wait_seconds, wait_inte
                 if wait_interval_seconds is not None:
                     wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
 
-                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                click.echo(
+                    f'Action completed. Waiting until the work request has entered state: {wait_for_state}',
+                    file=sys.stderr,
+                )
+
                 result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
             except oci.exceptions.MaximumWaitTimeExceeded as e:
                 # If we fail, we should show an error, but we should still provide the information to the customer
@@ -349,14 +363,19 @@ This option is a JSON dictionary of type dict(str, ConfigurationField).  For doc
 @cli_util.wrap_exceptions
 def create_migration_oic_discovery_details(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, compartment_id, source_id, application_name, discovery_details_service_instance_user, discovery_details_service_instance_password, display_name, description, pre_created_target_database_type, is_selective_migration, service_config, application_config, freeform_tags, defined_tags):
 
-    kwargs = {}
-    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    kwargs = {
+        'opc_request_id': cli_util.use_or_generate_request_id(
+            ctx.obj['request_id']
+        )
+    }
 
-    _details = {}
-    _details['discoveryDetails'] = {}
-    _details['compartmentId'] = compartment_id
-    _details['sourceId'] = source_id
-    _details['applicationName'] = application_name
+    _details = {
+        'discoveryDetails': {},
+        'compartmentId': compartment_id,
+        'sourceId': source_id,
+        'applicationName': application_name,
+    }
+
     _details['discoveryDetails']['serviceInstanceUser'] = discovery_details_service_instance_user
     _details['discoveryDetails']['serviceInstancePassword'] = discovery_details_service_instance_password
 
@@ -401,7 +420,11 @@ def create_migration_oic_discovery_details(ctx, from_json, wait_for_state, max_w
                 if wait_interval_seconds is not None:
                     wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
 
-                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                click.echo(
+                    f'Action completed. Waiting until the work request has entered state: {wait_for_state}',
+                    file=sys.stderr,
+                )
+
                 result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
             except oci.exceptions.MaximumWaitTimeExceeded as e:
                 # If we fail, we should show an error, but we should still provide the information to the customer

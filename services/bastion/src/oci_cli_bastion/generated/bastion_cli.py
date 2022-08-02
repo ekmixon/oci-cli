@@ -77,9 +77,7 @@ def change_bastion_compartment(ctx, from_json, bastion_id, compartment_id, if_ma
         kwargs['if_match'] = if_match
     kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
 
-    _details = {}
-    _details['compartmentId'] = compartment_id
-
+    _details = {'compartmentId': compartment_id}
     client = cli_util.build_client('bastion', 'bastion', ctx)
     result = client.change_bastion_compartment(
         bastion_id=bastion_id,
@@ -95,8 +93,8 @@ def change_bastion_compartment(ctx, from_json, bastion_id, compartment_id, if_ma
 @cli_util.option('--target-subnet-id', required=True, help=u"""The unique identifier (OCID) of the subnet that the bastion connects to.""")
 @cli_util.option('--name', help=u"""The name of the bastion, which can't be changed after creation.""")
 @cli_util.option('--phone-book-entry', help=u"""The phonebook entry of the customer's team, which can't be changed after creation. Not applicable to `standard` bastions.""")
-@cli_util.option('--static-jump-host-ip-addresses', type=custom_types.CLI_COMPLEX_TYPE, help=u"""A list of IP addresses of the hosts that the bastion has access to. Not applicable to `standard` bastions.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--client-cidr-block-allow-list', type=custom_types.CLI_COMPLEX_TYPE, help=u"""A list of address ranges in CIDR notation that you want to allow to connect to sessions hosted by this bastion.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--static-jump-host-ip-addresses', type=custom_types.CLI_COMPLEX_TYPE, help=f"""A list of IP addresses of the hosts that the bastion has access to. Not applicable to `standard` bastions.{custom_types.cli_complex_type.COMPLEX_TYPE_HELP}""")
+@cli_util.option('--client-cidr-block-allow-list', type=custom_types.CLI_COMPLEX_TYPE, help=f"""A list of address ranges in CIDR notation that you want to allow to connect to sessions hosted by this bastion.{custom_types.cli_complex_type.COMPLEX_TYPE_HELP}""")
 @cli_util.option('--max-session-ttl-in-seconds', type=click.INT, help=u"""The maximum amount of time that any session on the bastion can remain active.""")
 @cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Simple key-value pair that is applied without any predefined name, type or scope. Exists for cross-compatibility only. Example: `{\"bar-key\": \"value\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--defined-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Defined tags for this resource. Each key is predefined and scoped to a namespace. Example: `{\"foo-namespace\": {\"bar-key\": \"value\"}}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
@@ -110,13 +108,17 @@ def change_bastion_compartment(ctx, from_json, bastion_id, compartment_id, if_ma
 @cli_util.wrap_exceptions
 def create_bastion(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, bastion_type, compartment_id, target_subnet_id, name, phone_book_entry, static_jump_host_ip_addresses, client_cidr_block_allow_list, max_session_ttl_in_seconds, freeform_tags, defined_tags):
 
-    kwargs = {}
-    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    kwargs = {
+        'opc_request_id': cli_util.use_or_generate_request_id(
+            ctx.obj['request_id']
+        )
+    }
 
-    _details = {}
-    _details['bastionType'] = bastion_type
-    _details['compartmentId'] = compartment_id
-    _details['targetSubnetId'] = target_subnet_id
+    _details = {
+        'bastionType': bastion_type,
+        'compartmentId': compartment_id,
+        'targetSubnetId': target_subnet_id,
+    }
 
     if name is not None:
         _details['name'] = name
@@ -154,7 +156,11 @@ def create_bastion(ctx, from_json, wait_for_state, max_wait_seconds, wait_interv
                 if wait_interval_seconds is not None:
                     wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
 
-                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                click.echo(
+                    f'Action completed. Waiting until the work request has entered state: {wait_for_state}',
+                    file=sys.stderr,
+                )
+
                 result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
             except oci.exceptions.MaximumWaitTimeExceeded as e:
                 # If we fail, we should show an error, but we should still provide the information to the customer
@@ -172,8 +178,8 @@ def create_bastion(ctx, from_json, wait_for_state, max_wait_seconds, wait_interv
 
 @session_group.command(name=cli_util.override('bastion.create_session.command_name', 'create'), help=u"""Creates a new session in a bastion. A bastion session lets authorized users connect to a target resource for a predetermined amount of time. The Bastion service recognizes two types of sessions, managed SSH sessions and SSH port forwarding sessions. Managed SSH sessions require that the target resource has an OpenSSH server and the Oracle Cloud Agent both running. \n[Command Reference](createSession)""")
 @cli_util.option('--bastion-id', required=True, help=u"""The unique identifier (OCID) of the bastion on which to create this session.""")
-@cli_util.option('--target-resource-details', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--key-details', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--target-resource-details', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=f"""{custom_types.cli_complex_type.COMPLEX_TYPE_HELP}""")
+@cli_util.option('--key-details', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=f"""{custom_types.cli_complex_type.COMPLEX_TYPE_HELP}""")
 @cli_util.option('--display-name', help=u"""The name of the session.""")
 @cli_util.option('--key-type', type=custom_types.CliCaseInsensitiveChoice(["PUB"]), help=u"""The type of the key used to connect to the session. PUB is a standard public key in OpenSSH format.""")
 @cli_util.option('--session-ttl-in-seconds', type=click.INT, help=u"""The amount of time the session can remain active.""")
@@ -187,12 +193,19 @@ def create_bastion(ctx, from_json, wait_for_state, max_wait_seconds, wait_interv
 @cli_util.wrap_exceptions
 def create_session(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, bastion_id, target_resource_details, key_details, display_name, key_type, session_ttl_in_seconds):
 
-    kwargs = {}
-    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    kwargs = {
+        'opc_request_id': cli_util.use_or_generate_request_id(
+            ctx.obj['request_id']
+        )
+    }
 
-    _details = {}
-    _details['bastionId'] = bastion_id
-    _details['targetResourceDetails'] = cli_util.parse_json_parameter("target_resource_details", target_resource_details)
+    _details = {
+        'bastionId': bastion_id,
+        'targetResourceDetails': cli_util.parse_json_parameter(
+            "target_resource_details", target_resource_details
+        ),
+    }
+
     _details['keyDetails'] = cli_util.parse_json_parameter("key_details", key_details)
 
     if display_name is not None:
@@ -219,7 +232,11 @@ def create_session(ctx, from_json, wait_for_state, max_wait_seconds, wait_interv
                 if wait_interval_seconds is not None:
                     wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
 
-                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                click.echo(
+                    f'Action completed. Waiting until the work request has entered state: {wait_for_state}',
+                    file=sys.stderr,
+                )
+
                 result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
             except oci.exceptions.MaximumWaitTimeExceeded as e:
                 # If we fail, we should show an error, but we should still provide the information to the customer
@@ -237,7 +254,7 @@ def create_session(ctx, from_json, wait_for_state, max_wait_seconds, wait_interv
 
 @session_group.command(name=cli_util.override('bastion.create_session_create_managed_ssh_session_target_resource_details.command_name', 'create-session-create-managed-ssh-session-target-resource-details'), help=u"""Creates a new session in a bastion. A bastion session lets authorized users connect to a target resource for a predetermined amount of time. The Bastion service recognizes two types of sessions, managed SSH sessions and SSH port forwarding sessions. Managed SSH sessions require that the target resource has an OpenSSH server and the Oracle Cloud Agent both running. \n[Command Reference](createSession)""")
 @cli_util.option('--bastion-id', required=True, help=u"""The unique identifier (OCID) of the bastion on which to create this session.""")
-@cli_util.option('--key-details', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--key-details', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=f"""{custom_types.cli_complex_type.COMPLEX_TYPE_HELP}""")
 @cli_util.option('--target-resource-details-target-resource-operating-system-user-name', required=True, help=u"""The name of the user on the target resource operating system that the session uses for the connection.""")
 @cli_util.option('--target-resource-details-target-resource-id', required=True, help=u"""The unique identifier (OCID) of the target resource (a Compute instance, for example) that the session connects to.""")
 @cli_util.option('--display-name', help=u"""The name of the session.""")
@@ -255,13 +272,20 @@ def create_session(ctx, from_json, wait_for_state, max_wait_seconds, wait_interv
 @cli_util.wrap_exceptions
 def create_session_create_managed_ssh_session_target_resource_details(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, bastion_id, key_details, target_resource_details_target_resource_operating_system_user_name, target_resource_details_target_resource_id, display_name, key_type, session_ttl_in_seconds, target_resource_details_target_resource_port, target_resource_details_target_resource_private_ip_address):
 
-    kwargs = {}
-    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    kwargs = {
+        'opc_request_id': cli_util.use_or_generate_request_id(
+            ctx.obj['request_id']
+        )
+    }
 
-    _details = {}
-    _details['targetResourceDetails'] = {}
-    _details['bastionId'] = bastion_id
-    _details['keyDetails'] = cli_util.parse_json_parameter("key_details", key_details)
+    _details = {
+        'targetResourceDetails': {},
+        'bastionId': bastion_id,
+        'keyDetails': cli_util.parse_json_parameter(
+            "key_details", key_details
+        ),
+    }
+
     _details['targetResourceDetails']['targetResourceOperatingSystemUserName'] = target_resource_details_target_resource_operating_system_user_name
     _details['targetResourceDetails']['targetResourceId'] = target_resource_details_target_resource_id
 
@@ -297,7 +321,11 @@ def create_session_create_managed_ssh_session_target_resource_details(ctx, from_
                 if wait_interval_seconds is not None:
                     wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
 
-                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                click.echo(
+                    f'Action completed. Waiting until the work request has entered state: {wait_for_state}',
+                    file=sys.stderr,
+                )
+
                 result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
             except oci.exceptions.MaximumWaitTimeExceeded as e:
                 # If we fail, we should show an error, but we should still provide the information to the customer
@@ -315,7 +343,7 @@ def create_session_create_managed_ssh_session_target_resource_details(ctx, from_
 
 @session_group.command(name=cli_util.override('bastion.create_session_create_port_forwarding_session_target_resource_details.command_name', 'create-session-create-port-forwarding-session-target-resource-details'), help=u"""Creates a new session in a bastion. A bastion session lets authorized users connect to a target resource for a predetermined amount of time. The Bastion service recognizes two types of sessions, managed SSH sessions and SSH port forwarding sessions. Managed SSH sessions require that the target resource has an OpenSSH server and the Oracle Cloud Agent both running. \n[Command Reference](createSession)""")
 @cli_util.option('--bastion-id', required=True, help=u"""The unique identifier (OCID) of the bastion on which to create this session.""")
-@cli_util.option('--key-details', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--key-details', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=f"""{custom_types.cli_complex_type.COMPLEX_TYPE_HELP}""")
 @cli_util.option('--display-name', help=u"""The name of the session.""")
 @cli_util.option('--key-type', type=custom_types.CliCaseInsensitiveChoice(["PUB"]), help=u"""The type of the key used to connect to the session. PUB is a standard public key in OpenSSH format.""")
 @cli_util.option('--session-ttl-in-seconds', type=click.INT, help=u"""The amount of time the session can remain active.""")
@@ -332,13 +360,19 @@ def create_session_create_managed_ssh_session_target_resource_details(ctx, from_
 @cli_util.wrap_exceptions
 def create_session_create_port_forwarding_session_target_resource_details(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, bastion_id, key_details, display_name, key_type, session_ttl_in_seconds, target_resource_details_target_resource_port, target_resource_details_target_resource_id, target_resource_details_target_resource_private_ip_address):
 
-    kwargs = {}
-    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    kwargs = {
+        'opc_request_id': cli_util.use_or_generate_request_id(
+            ctx.obj['request_id']
+        )
+    }
 
-    _details = {}
-    _details['targetResourceDetails'] = {}
-    _details['bastionId'] = bastion_id
-    _details['keyDetails'] = cli_util.parse_json_parameter("key_details", key_details)
+    _details = {
+        'targetResourceDetails': {},
+        'bastionId': bastion_id,
+        'keyDetails': cli_util.parse_json_parameter(
+            "key_details", key_details
+        ),
+    }
 
     if display_name is not None:
         _details['displayName'] = display_name
@@ -375,7 +409,11 @@ def create_session_create_port_forwarding_session_target_resource_details(ctx, f
                 if wait_interval_seconds is not None:
                     wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
 
-                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                click.echo(
+                    f'Action completed. Waiting until the work request has entered state: {wait_for_state}',
+                    file=sys.stderr,
+                )
+
                 result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
             except oci.exceptions.MaximumWaitTimeExceeded as e:
                 # If we fail, we should show an error, but we should still provide the information to the customer
@@ -427,7 +465,11 @@ def delete_bastion(ctx, from_json, wait_for_state, max_wait_seconds, wait_interv
                 if wait_interval_seconds is not None:
                     wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
 
-                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                click.echo(
+                    f'Action completed. Waiting until the work request has entered state: {wait_for_state}',
+                    file=sys.stderr,
+                )
+
                 result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
             except oci.exceptions.MaximumWaitTimeExceeded as e:
                 # If we fail, we should show an error, but we should still provide the information to the customer
@@ -479,7 +521,11 @@ def delete_session(ctx, from_json, wait_for_state, max_wait_seconds, wait_interv
                 if wait_interval_seconds is not None:
                     wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
 
-                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                click.echo(
+                    f'Action completed. Waiting until the work request has entered state: {wait_for_state}',
+                    file=sys.stderr,
+                )
+
                 result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
             except oci.exceptions.MaximumWaitTimeExceeded as e:
                 # If we fail, we should show an error, but we should still provide the information to the customer
@@ -507,8 +553,12 @@ def get_bastion(ctx, from_json, bastion_id):
     if isinstance(bastion_id, six.string_types) and len(bastion_id.strip()) == 0:
         raise click.UsageError('Parameter --bastion-id cannot be whitespace or empty string')
 
-    kwargs = {}
-    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    kwargs = {
+        'opc_request_id': cli_util.use_or_generate_request_id(
+            ctx.obj['request_id']
+        )
+    }
+
     client = cli_util.build_client('bastion', 'bastion', ctx)
     result = client.get_bastion(
         bastion_id=bastion_id,
@@ -529,8 +579,12 @@ def get_session(ctx, from_json, session_id):
     if isinstance(session_id, six.string_types) and len(session_id.strip()) == 0:
         raise click.UsageError('Parameter --session-id cannot be whitespace or empty string')
 
-    kwargs = {}
-    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    kwargs = {
+        'opc_request_id': cli_util.use_or_generate_request_id(
+            ctx.obj['request_id']
+        )
+    }
+
     client = cli_util.build_client('bastion', 'bastion', ctx)
     result = client.get_session(
         session_id=session_id,
@@ -551,8 +605,12 @@ def get_work_request(ctx, from_json, work_request_id):
     if isinstance(work_request_id, six.string_types) and len(work_request_id.strip()) == 0:
         raise click.UsageError('Parameter --work-request-id cannot be whitespace or empty string')
 
-    kwargs = {}
-    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    kwargs = {
+        'opc_request_id': cli_util.use_or_generate_request_id(
+            ctx.obj['request_id']
+        )
+    }
+
     client = cli_util.build_client('bastion', 'bastion', ctx)
     result = client.get_work_request(
         work_request_id=work_request_id,

@@ -43,13 +43,13 @@ announcements_preferences_root_group.add_command(announcements_preferences_group
 @cli_util.wrap_exceptions
 def create_announcements_preference(ctx, from_json, type, preference_type, is_unsubscribed, compartment_id):
 
-    kwargs = {}
-    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    kwargs = {
+        'opc_request_id': cli_util.use_or_generate_request_id(
+            ctx.obj['request_id']
+        )
+    }
 
-    _details = {}
-    _details['type'] = type
-    _details['preferenceType'] = preference_type
-
+    _details = {'type': type, 'preferenceType': preference_type}
     if is_unsubscribed is not None:
         _details['isUnsubscribed'] = is_unsubscribed
 
@@ -78,8 +78,12 @@ def get_announcements_preference(ctx, from_json, preference_id):
     if isinstance(preference_id, six.string_types) and len(preference_id.strip()) == 0:
         raise click.UsageError('Parameter --preference-id cannot be whitespace or empty string')
 
-    kwargs = {}
-    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    kwargs = {
+        'opc_request_id': cli_util.use_or_generate_request_id(
+            ctx.obj['request_id']
+        )
+    }
+
     client = cli_util.build_client('announcements_service', 'announcements_preferences', ctx)
     result = client.get_announcements_preference(
         preference_id=preference_id,
@@ -158,10 +162,7 @@ def update_announcements_preference(ctx, from_json, preference_id, type, prefere
         kwargs['if_match'] = if_match
     kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
 
-    _details = {}
-    _details['type'] = type
-    _details['preferenceType'] = preference_type
-
+    _details = {'type': type, 'preferenceType': preference_type}
     if is_unsubscribed is not None:
         _details['isUnsubscribed'] = is_unsubscribed
 

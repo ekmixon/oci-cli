@@ -101,9 +101,7 @@ def change_container_repository_compartment(ctx, from_json, repository_id, compa
         kwargs['if_match'] = if_match
     kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
 
-    _details = {}
-    _details['compartmentId'] = compartment_id
-
+    _details = {'compartmentId': compartment_id}
     client = cli_util.build_client('artifacts', 'artifacts', ctx)
     result = client.change_container_repository_compartment(
         repository_id=repository_id,
@@ -134,9 +132,7 @@ def change_repository_compartment(ctx, from_json, repository_id, compartment_id,
         kwargs['if_match'] = if_match
     kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
 
-    _details = {}
-    _details['compartmentId'] = compartment_id
-
+    _details = {'compartmentId': compartment_id}
     client = cli_util.build_client('artifacts', 'artifacts', ctx)
     result = client.change_repository_compartment(
         repository_id=repository_id,
@@ -173,14 +169,15 @@ def create_container_image_signature(ctx, from_json, compartment_id, image_id, k
         kwargs['if_match'] = if_match
     kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
 
-    _details = {}
-    _details['compartmentId'] = compartment_id
-    _details['imageId'] = image_id
-    _details['kmsKeyId'] = kms_key_id
-    _details['kmsKeyVersionId'] = kms_key_version_id
-    _details['message'] = message
-    _details['signature'] = signature
-    _details['signingAlgorithm'] = signing_algorithm
+    _details = {
+        'compartmentId': compartment_id,
+        'imageId': image_id,
+        'kmsKeyId': kms_key_id,
+        'kmsKeyVersionId': kms_key_version_id,
+        'message': message,
+        'signature': signature,
+        'signingAlgorithm': signing_algorithm,
+    }
 
     client = cli_util.build_client('artifacts', 'artifacts', ctx)
     result = client.create_container_image_signature(
@@ -195,7 +192,7 @@ def create_container_image_signature(ctx, from_json, compartment_id, image_id, k
 @cli_util.option('--display-name', required=True, help=u"""The container repository name.""")
 @cli_util.option('--is-immutable', type=click.BOOL, help=u"""Whether the repository is immutable. Images cannot be overwritten in an immutable repository.""")
 @cli_util.option('--is-public', type=click.BOOL, help=u"""Whether the repository is public. A public repository allows unauthenticated access.""")
-@cli_util.option('--readme', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--readme', type=custom_types.CLI_COMPLEX_TYPE, help=f"""{custom_types.cli_complex_type.COMPLEX_TYPE_HELP}""")
 @cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["AVAILABLE", "DELETING", "DELETED"]), multiple=True, help="""This operation creates, modifies or deletes a resource that has a defined lifecycle state. Specify this option to perform the action and then wait until the resource reaches a given lifecycle state. Multiple states can be specified, returning on the first state. For example, --wait-for-state SUCCEEDED --wait-for-state FAILED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
 @cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the resource to reach the lifecycle state defined by --wait-for-state. Defaults to 1200 seconds.""")
 @cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the resource to see if it has reached the lifecycle state defined by --wait-for-state. Defaults to 30 seconds.""")
@@ -206,13 +203,13 @@ def create_container_image_signature(ctx, from_json, compartment_id, image_id, k
 @cli_util.wrap_exceptions
 def create_container_repository(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, compartment_id, display_name, is_immutable, is_public, readme):
 
-    kwargs = {}
-    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    kwargs = {
+        'opc_request_id': cli_util.use_or_generate_request_id(
+            ctx.obj['request_id']
+        )
+    }
 
-    _details = {}
-    _details['compartmentId'] = compartment_id
-    _details['displayName'] = display_name
-
+    _details = {'compartmentId': compartment_id, 'displayName': display_name}
     if is_immutable is not None:
         _details['isImmutable'] = is_immutable
 
@@ -237,7 +234,11 @@ def create_container_repository(ctx, from_json, wait_for_state, max_wait_seconds
                 if wait_interval_seconds is not None:
                     wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
 
-                click.echo('Action completed. Waiting until the resource has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                click.echo(
+                    f'Action completed. Waiting until the resource has entered state: {wait_for_state}',
+                    file=sys.stderr,
+                )
+
                 result = oci.wait_until(client, client.get_container_repository(result.data.id), 'lifecycle_state', wait_for_state, **wait_period_kwargs)
             except oci.exceptions.MaximumWaitTimeExceeded as e:
                 # If we fail, we should show an error, but we should still provide the information to the customer
@@ -275,13 +276,17 @@ Example: `{\"Operations\": {\"CostCenter\": \"42\"}}`""" + custom_types.cli_comp
 @cli_util.wrap_exceptions
 def create_repository(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, compartment_id, repository_type, is_immutable, display_name, description, freeform_tags, defined_tags):
 
-    kwargs = {}
-    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    kwargs = {
+        'opc_request_id': cli_util.use_or_generate_request_id(
+            ctx.obj['request_id']
+        )
+    }
 
-    _details = {}
-    _details['compartmentId'] = compartment_id
-    _details['repositoryType'] = repository_type
-    _details['isImmutable'] = is_immutable
+    _details = {
+        'compartmentId': compartment_id,
+        'repositoryType': repository_type,
+        'isImmutable': is_immutable,
+    }
 
     if display_name is not None:
         _details['displayName'] = display_name
@@ -310,7 +315,11 @@ def create_repository(ctx, from_json, wait_for_state, max_wait_seconds, wait_int
                 if wait_interval_seconds is not None:
                     wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
 
-                click.echo('Action completed. Waiting until the resource has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                click.echo(
+                    f'Action completed. Waiting until the resource has entered state: {wait_for_state}',
+                    file=sys.stderr,
+                )
+
                 result = oci.wait_until(client, client.get_repository(result.data.id), 'lifecycle_state', wait_for_state, **wait_period_kwargs)
             except oci.exceptions.MaximumWaitTimeExceeded as e:
                 # If we fail, we should show an error, but we should still provide the information to the customer
@@ -347,13 +356,13 @@ Example: `{\"Operations\": {\"CostCenter\": \"42\"}}`""" + custom_types.cli_comp
 @cli_util.wrap_exceptions
 def create_repository_create_generic_repository_details(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, compartment_id, is_immutable, display_name, description, freeform_tags, defined_tags):
 
-    kwargs = {}
-    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    kwargs = {
+        'opc_request_id': cli_util.use_or_generate_request_id(
+            ctx.obj['request_id']
+        )
+    }
 
-    _details = {}
-    _details['compartmentId'] = compartment_id
-    _details['isImmutable'] = is_immutable
-
+    _details = {'compartmentId': compartment_id, 'isImmutable': is_immutable}
     if display_name is not None:
         _details['displayName'] = display_name
 
@@ -383,7 +392,11 @@ def create_repository_create_generic_repository_details(ctx, from_json, wait_for
                 if wait_interval_seconds is not None:
                     wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
 
-                click.echo('Action completed. Waiting until the resource has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                click.echo(
+                    f'Action completed. Waiting until the resource has entered state: {wait_for_state}',
+                    file=sys.stderr,
+                )
+
                 result = oci.wait_until(client, client.get_repository(result.data.id), 'lifecycle_state', wait_for_state, **wait_period_kwargs)
             except oci.exceptions.MaximumWaitTimeExceeded as e:
                 # If we fail, we should show an error, but we should still provide the information to the customer
@@ -437,7 +450,11 @@ def delete_container_image(ctx, from_json, wait_for_state, max_wait_seconds, wai
                 if wait_interval_seconds is not None:
                     wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
 
-                click.echo('Action completed. Waiting until the resource has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                click.echo(
+                    f'Action completed. Waiting until the resource has entered state: {wait_for_state}',
+                    file=sys.stderr,
+                )
+
                 oci.wait_until(client, client.get_container_image(image_id), 'lifecycle_state', wait_for_state, succeed_on_not_found=True, **wait_period_kwargs)
             except oci.exceptions.ServiceError as e:
                 # We make an initial service call so we can pass the result to oci.wait_until(), however if we are waiting on the
@@ -447,9 +464,7 @@ def delete_container_image(ctx, from_json, wait_for_state, max_wait_seconds, wai
                 # succeed_on_not_found=True to the waiter).
                 #
                 # Any non-404 should still result in the exception being thrown.
-                if e.status == 404:
-                    pass
-                else:
+                if e.status != 404:
                     raise
             except oci.exceptions.MaximumWaitTimeExceeded as e:
                 # If we fail, we should show an error, but we should still provide the information to the customer
@@ -531,7 +546,11 @@ def delete_container_repository(ctx, from_json, wait_for_state, max_wait_seconds
                 if wait_interval_seconds is not None:
                     wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
 
-                click.echo('Action completed. Waiting until the resource has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                click.echo(
+                    f'Action completed. Waiting until the resource has entered state: {wait_for_state}',
+                    file=sys.stderr,
+                )
+
                 oci.wait_until(client, client.get_container_repository(repository_id), 'lifecycle_state', wait_for_state, succeed_on_not_found=True, **wait_period_kwargs)
             except oci.exceptions.ServiceError as e:
                 # We make an initial service call so we can pass the result to oci.wait_until(), however if we are waiting on the
@@ -541,9 +560,7 @@ def delete_container_repository(ctx, from_json, wait_for_state, max_wait_seconds
                 # succeed_on_not_found=True to the waiter).
                 #
                 # Any non-404 should still result in the exception being thrown.
-                if e.status == 404:
-                    pass
-                else:
+                if e.status != 404:
                     raise
             except oci.exceptions.MaximumWaitTimeExceeded as e:
                 # If we fail, we should show an error, but we should still provide the information to the customer
@@ -597,7 +614,11 @@ def delete_generic_artifact(ctx, from_json, wait_for_state, max_wait_seconds, wa
                 if wait_interval_seconds is not None:
                     wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
 
-                click.echo('Action completed. Waiting until the resource has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                click.echo(
+                    f'Action completed. Waiting until the resource has entered state: {wait_for_state}',
+                    file=sys.stderr,
+                )
+
                 oci.wait_until(client, client.get_generic_artifact(artifact_id), 'lifecycle_state', wait_for_state, succeed_on_not_found=True, **wait_period_kwargs)
             except oci.exceptions.ServiceError as e:
                 # We make an initial service call so we can pass the result to oci.wait_until(), however if we are waiting on the
@@ -607,9 +628,7 @@ def delete_generic_artifact(ctx, from_json, wait_for_state, max_wait_seconds, wa
                 # succeed_on_not_found=True to the waiter).
                 #
                 # Any non-404 should still result in the exception being thrown.
-                if e.status == 404:
-                    pass
-                else:
+                if e.status != 404:
                     raise
             except oci.exceptions.MaximumWaitTimeExceeded as e:
                 # If we fail, we should show an error, but we should still provide the information to the customer
@@ -705,7 +724,11 @@ def delete_repository(ctx, from_json, wait_for_state, max_wait_seconds, wait_int
                 if wait_interval_seconds is not None:
                     wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
 
-                click.echo('Action completed. Waiting until the resource has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                click.echo(
+                    f'Action completed. Waiting until the resource has entered state: {wait_for_state}',
+                    file=sys.stderr,
+                )
+
                 oci.wait_until(client, client.get_repository(repository_id), 'lifecycle_state', wait_for_state, succeed_on_not_found=True, **wait_period_kwargs)
             except oci.exceptions.ServiceError as e:
                 # We make an initial service call so we can pass the result to oci.wait_until(), however if we are waiting on the
@@ -715,9 +738,7 @@ def delete_repository(ctx, from_json, wait_for_state, max_wait_seconds, wait_int
                 # succeed_on_not_found=True to the waiter).
                 #
                 # Any non-404 should still result in the exception being thrown.
-                if e.status == 404:
-                    pass
-                else:
+                if e.status != 404:
                     raise
             except oci.exceptions.MaximumWaitTimeExceeded as e:
                 # If we fail, we should show an error, but we should still provide the information to the customer
@@ -742,8 +763,12 @@ def delete_repository(ctx, from_json, wait_for_state, max_wait_seconds, wait_int
 @cli_util.wrap_exceptions
 def get_container_configuration(ctx, from_json, compartment_id):
 
-    kwargs = {}
-    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    kwargs = {
+        'opc_request_id': cli_util.use_or_generate_request_id(
+            ctx.obj['request_id']
+        )
+    }
+
     client = cli_util.build_client('artifacts', 'artifacts', ctx)
     result = client.get_container_configuration(
         compartment_id=compartment_id,
@@ -766,8 +791,12 @@ def get_container_image(ctx, from_json, image_id):
     if isinstance(image_id, six.string_types) and len(image_id.strip()) == 0:
         raise click.UsageError('Parameter --image-id cannot be whitespace or empty string')
 
-    kwargs = {}
-    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    kwargs = {
+        'opc_request_id': cli_util.use_or_generate_request_id(
+            ctx.obj['request_id']
+        )
+    }
+
     client = cli_util.build_client('artifacts', 'artifacts', ctx)
     result = client.get_container_image(
         image_id=image_id,
@@ -790,8 +819,12 @@ def get_container_image_signature(ctx, from_json, image_signature_id):
     if isinstance(image_signature_id, six.string_types) and len(image_signature_id.strip()) == 0:
         raise click.UsageError('Parameter --image-signature-id cannot be whitespace or empty string')
 
-    kwargs = {}
-    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    kwargs = {
+        'opc_request_id': cli_util.use_or_generate_request_id(
+            ctx.obj['request_id']
+        )
+    }
+
     client = cli_util.build_client('artifacts', 'artifacts', ctx)
     result = client.get_container_image_signature(
         image_signature_id=image_signature_id,
@@ -814,8 +847,12 @@ def get_container_repository(ctx, from_json, repository_id):
     if isinstance(repository_id, six.string_types) and len(repository_id.strip()) == 0:
         raise click.UsageError('Parameter --repository-id cannot be whitespace or empty string')
 
-    kwargs = {}
-    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    kwargs = {
+        'opc_request_id': cli_util.use_or_generate_request_id(
+            ctx.obj['request_id']
+        )
+    }
+
     client = cli_util.build_client('artifacts', 'artifacts', ctx)
     result = client.get_container_repository(
         repository_id=repository_id,
@@ -838,8 +875,12 @@ def get_generic_artifact(ctx, from_json, artifact_id):
     if isinstance(artifact_id, six.string_types) and len(artifact_id.strip()) == 0:
         raise click.UsageError('Parameter --artifact-id cannot be whitespace or empty string')
 
-    kwargs = {}
-    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    kwargs = {
+        'opc_request_id': cli_util.use_or_generate_request_id(
+            ctx.obj['request_id']
+        )
+    }
+
     client = cli_util.build_client('artifacts', 'artifacts', ctx)
     result = client.get_generic_artifact(
         artifact_id=artifact_id,
@@ -874,8 +915,12 @@ def get_generic_artifact_by_path(ctx, from_json, repository_id, artifact_path, v
     if isinstance(version_parameterconflict, six.string_types) and len(version_parameterconflict.strip()) == 0:
         raise click.UsageError('Parameter --version-parameterconflict cannot be whitespace or empty string')
 
-    kwargs = {}
-    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    kwargs = {
+        'opc_request_id': cli_util.use_or_generate_request_id(
+            ctx.obj['request_id']
+        )
+    }
+
     client = cli_util.build_client('artifacts', 'artifacts', ctx)
     result = client.get_generic_artifact_by_path(
         repository_id=repository_id,
@@ -900,8 +945,12 @@ def get_repository(ctx, from_json, repository_id):
     if isinstance(repository_id, six.string_types) and len(repository_id.strip()) == 0:
         raise click.UsageError('Parameter --repository-id cannot be whitespace or empty string')
 
-    kwargs = {}
-    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    kwargs = {
+        'opc_request_id': cli_util.use_or_generate_request_id(
+            ctx.obj['request_id']
+        )
+    }
+
     client = cli_util.build_client('artifacts', 'artifacts', ctx)
     result = client.get_repository(
         repository_id=repository_id,
@@ -1336,9 +1385,7 @@ def remove_container_version(ctx, from_json, wait_for_state, max_wait_seconds, w
         kwargs['if_match'] = if_match
     kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
 
-    _details = {}
-    _details['version'] = version_parameterconflict
-
+    _details = {'version': version_parameterconflict}
     client = cli_util.build_client('artifacts', 'artifacts', ctx)
     result = client.remove_container_version(
         image_id=image_id,
@@ -1355,7 +1402,11 @@ def remove_container_version(ctx, from_json, wait_for_state, max_wait_seconds, w
                 if wait_interval_seconds is not None:
                     wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
 
-                click.echo('Action completed. Waiting until the resource has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                click.echo(
+                    f'Action completed. Waiting until the resource has entered state: {wait_for_state}',
+                    file=sys.stderr,
+                )
+
                 result = oci.wait_until(client, client.get_container_image(result.data.id), 'lifecycle_state', wait_for_state, **wait_period_kwargs)
             except oci.exceptions.MaximumWaitTimeExceeded as e:
                 # If we fail, we should show an error, but we should still provide the information to the customer
@@ -1416,7 +1467,11 @@ def restore_container_image(ctx, from_json, wait_for_state, max_wait_seconds, wa
                 if wait_interval_seconds is not None:
                     wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
 
-                click.echo('Action completed. Waiting until the resource has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                click.echo(
+                    f'Action completed. Waiting until the resource has entered state: {wait_for_state}',
+                    file=sys.stderr,
+                )
+
                 result = oci.wait_until(client, client.get_container_image(result.data.id), 'lifecycle_state', wait_for_state, **wait_period_kwargs)
             except oci.exceptions.MaximumWaitTimeExceeded as e:
                 # If we fail, we should show an error, but we should still provide the information to the customer

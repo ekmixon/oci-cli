@@ -55,8 +55,12 @@ def get_span(ctx, from_json, apm_domain_id, span_key, trace_key):
     if isinstance(trace_key, six.string_types) and len(trace_key.strip()) == 0:
         raise click.UsageError('Parameter --trace-key cannot be whitespace or empty string')
 
-    kwargs = {}
-    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    kwargs = {
+        'opc_request_id': cli_util.use_or_generate_request_id(
+            ctx.obj['request_id']
+        )
+    }
+
     client = cli_util.build_client('apm_traces', 'trace', ctx)
     result = client.get_span(
         apm_domain_id=apm_domain_id,
@@ -80,8 +84,12 @@ def get_trace(ctx, from_json, apm_domain_id, trace_key):
     if isinstance(trace_key, six.string_types) and len(trace_key.strip()) == 0:
         raise click.UsageError('Parameter --trace-key cannot be whitespace or empty string')
 
-    kwargs = {}
-    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    kwargs = {
+        'opc_request_id': cli_util.use_or_generate_request_id(
+            ctx.obj['request_id']
+        )
+    }
+
     client = cli_util.build_client('apm_traces', 'trace', ctx)
     result = client.get_trace(
         apm_domain_id=apm_domain_id,

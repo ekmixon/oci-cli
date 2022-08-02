@@ -136,9 +136,7 @@ def change_ai_private_endpoint_compartment(ctx, from_json, wait_for_state, max_w
         kwargs['if_match'] = if_match
     kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
 
-    _details = {}
-    _details['compartmentId'] = compartment_id
-
+    _details = {'compartmentId': compartment_id}
     client = cli_util.build_client('ai_anomaly_detection', 'anomaly_detection', ctx)
     result = client.change_ai_private_endpoint_compartment(
         ai_private_endpoint_id=ai_private_endpoint_id,
@@ -155,7 +153,11 @@ def change_ai_private_endpoint_compartment(ctx, from_json, wait_for_state, max_w
                 if wait_interval_seconds is not None:
                     wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
 
-                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                click.echo(
+                    f'Action completed. Waiting until the work request has entered state: {wait_for_state}',
+                    file=sys.stderr,
+                )
+
                 result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
             except oci.exceptions.MaximumWaitTimeExceeded as e:
                 # If we fail, we should show an error, but we should still provide the information to the customer
@@ -193,9 +195,7 @@ def change_data_asset_compartment(ctx, from_json, wait_for_state, max_wait_secon
         kwargs['if_match'] = if_match
     kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
 
-    _details = {}
-    _details['compartmentId'] = compartment_id
-
+    _details = {'compartmentId': compartment_id}
     client = cli_util.build_client('ai_anomaly_detection', 'anomaly_detection', ctx)
     result = client.change_data_asset_compartment(
         data_asset_id=data_asset_id,
@@ -212,7 +212,11 @@ def change_data_asset_compartment(ctx, from_json, wait_for_state, max_wait_secon
                 if wait_interval_seconds is not None:
                     wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
 
-                click.echo('Action completed. Waiting until the resource has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                click.echo(
+                    f'Action completed. Waiting until the resource has entered state: {wait_for_state}',
+                    file=sys.stderr,
+                )
+
                 result = oci.wait_until(client, client.get_data_asset(result.data.id), 'lifecycle_state', wait_for_state, **wait_period_kwargs)
             except oci.exceptions.MaximumWaitTimeExceeded as e:
                 # If we fail, we should show an error, but we should still provide the information to the customer
@@ -247,9 +251,7 @@ def change_model_compartment(ctx, from_json, model_id, compartment_id, if_match)
         kwargs['if_match'] = if_match
     kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
 
-    _details = {}
-    _details['compartmentId'] = compartment_id
-
+    _details = {'compartmentId': compartment_id}
     client = cli_util.build_client('ai_anomaly_detection', 'anomaly_detection', ctx)
     result = client.change_model_compartment(
         model_id=model_id,
@@ -278,9 +280,7 @@ def change_project_compartment(ctx, from_json, project_id, compartment_id, if_ma
         kwargs['if_match'] = if_match
     kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
 
-    _details = {}
-    _details['compartmentId'] = compartment_id
-
+    _details = {'compartmentId': compartment_id}
     client = cli_util.build_client('ai_anomaly_detection', 'anomaly_detection', ctx)
     result = client.change_project_compartment(
         project_id=project_id,
@@ -291,7 +291,7 @@ def change_project_compartment(ctx, from_json, project_id, compartment_id, if_ma
 
 
 @ai_private_endpoint_group.command(name=cli_util.override('anomaly_detection.create_ai_private_endpoint.command_name', 'create'), help=u"""Create a new private reverse connection endpoint. \n[Command Reference](createAiPrivateEndpoint)""")
-@cli_util.option('--dns-zones', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""List of DNS zones to be used by the data assets. Example: custpvtsubnet.oraclevcn.com for data asset: db.custpvtsubnet.oraclevcn.com""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--dns-zones', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=f"""List of DNS zones to be used by the data assets. Example: custpvtsubnet.oraclevcn.com for data asset: db.custpvtsubnet.oraclevcn.com{custom_types.cli_complex_type.COMPLEX_TYPE_HELP}""")
 @cli_util.option('--subnet-id', required=True, help=u"""The OCID of subnet to which the reverse connection is to be created.""")
 @cli_util.option('--compartment-id', required=True, help=u"""Compartment identifier.""")
 @cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Simple key-value pair that is applied without any predefined name, type or scope. Exists for cross-compatibility only. Example: `{\"bar-key\": \"value\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
@@ -307,11 +307,13 @@ def change_project_compartment(ctx, from_json, project_id, compartment_id, if_ma
 @cli_util.wrap_exceptions
 def create_ai_private_endpoint(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, dns_zones, subnet_id, compartment_id, freeform_tags, defined_tags, display_name):
 
-    kwargs = {}
-    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    kwargs = {
+        'opc_request_id': cli_util.use_or_generate_request_id(
+            ctx.obj['request_id']
+        )
+    }
 
-    _details = {}
-    _details['dnsZones'] = cli_util.parse_json_parameter("dns_zones", dns_zones)
+    _details = {'dnsZones': cli_util.parse_json_parameter("dns_zones", dns_zones)}
     _details['subnetId'] = subnet_id
     _details['compartmentId'] = compartment_id
 
@@ -339,7 +341,11 @@ def create_ai_private_endpoint(ctx, from_json, wait_for_state, max_wait_seconds,
                 if wait_interval_seconds is not None:
                     wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
 
-                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                click.echo(
+                    f'Action completed. Waiting until the work request has entered state: {wait_for_state}',
+                    file=sys.stderr,
+                )
+
                 result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
             except oci.exceptions.MaximumWaitTimeExceeded as e:
                 # If we fail, we should show an error, but we should still provide the information to the customer
@@ -358,7 +364,7 @@ def create_ai_private_endpoint(ctx, from_json, wait_for_state, max_wait_seconds,
 @data_asset_group.command(name=cli_util.override('anomaly_detection.create_data_asset.command_name', 'create'), help=u"""Creates a new DataAsset. \n[Command Reference](createDataAsset)""")
 @cli_util.option('--compartment-id', required=True, help=u"""The OCID for the data asset's compartment.""")
 @cli_util.option('--project-id', required=True, help=u"""The [OCID] of the project to associate with the data asset.""")
-@cli_util.option('--data-source-details', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--data-source-details', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=f"""{custom_types.cli_complex_type.COMPLEX_TYPE_HELP}""")
 @cli_util.option('--display-name', help=u"""A user-friendly display name for the resource. It does not have to be unique and can be modified. Avoid entering confidential information.""")
 @cli_util.option('--description', help=u"""A short description of the Ai data asset""")
 @cli_util.option('--private-endpoint-id', help=u"""OCID of Private Endpoint.""")
@@ -374,13 +380,19 @@ def create_ai_private_endpoint(ctx, from_json, wait_for_state, max_wait_seconds,
 @cli_util.wrap_exceptions
 def create_data_asset(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, compartment_id, project_id, data_source_details, display_name, description, private_endpoint_id, freeform_tags, defined_tags):
 
-    kwargs = {}
-    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    kwargs = {
+        'opc_request_id': cli_util.use_or_generate_request_id(
+            ctx.obj['request_id']
+        )
+    }
 
-    _details = {}
-    _details['compartmentId'] = compartment_id
-    _details['projectId'] = project_id
-    _details['dataSourceDetails'] = cli_util.parse_json_parameter("data_source_details", data_source_details)
+    _details = {
+        'compartmentId': compartment_id,
+        'projectId': project_id,
+        'dataSourceDetails': cli_util.parse_json_parameter(
+            "data_source_details", data_source_details
+        ),
+    }
 
     if display_name is not None:
         _details['displayName'] = display_name
@@ -412,7 +424,11 @@ def create_data_asset(ctx, from_json, wait_for_state, max_wait_seconds, wait_int
                 if wait_interval_seconds is not None:
                     wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
 
-                click.echo('Action completed. Waiting until the resource has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                click.echo(
+                    f'Action completed. Waiting until the resource has entered state: {wait_for_state}',
+                    file=sys.stderr,
+                )
+
                 result = oci.wait_until(client, client.get_data_asset(result.data.id), 'lifecycle_state', wait_for_state, **wait_period_kwargs)
             except oci.exceptions.MaximumWaitTimeExceeded as e:
                 # If we fail, we should show an error, but we should still provide the information to the customer
@@ -449,13 +465,17 @@ def create_data_asset(ctx, from_json, wait_for_state, max_wait_seconds, wait_int
 @cli_util.wrap_exceptions
 def create_data_asset_data_source_details_object_storage(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, compartment_id, project_id, display_name, description, private_endpoint_id, freeform_tags, defined_tags, data_source_details_namespace, data_source_details_bucket_name, data_source_details_object_name):
 
-    kwargs = {}
-    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    kwargs = {
+        'opc_request_id': cli_util.use_or_generate_request_id(
+            ctx.obj['request_id']
+        )
+    }
 
-    _details = {}
-    _details['dataSourceDetails'] = {}
-    _details['compartmentId'] = compartment_id
-    _details['projectId'] = project_id
+    _details = {
+        'dataSourceDetails': {},
+        'compartmentId': compartment_id,
+        'projectId': project_id,
+    }
 
     if display_name is not None:
         _details['displayName'] = display_name
@@ -498,7 +518,11 @@ def create_data_asset_data_source_details_object_storage(ctx, from_json, wait_fo
                 if wait_interval_seconds is not None:
                     wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
 
-                click.echo('Action completed. Waiting until the resource has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                click.echo(
+                    f'Action completed. Waiting until the resource has entered state: {wait_for_state}',
+                    file=sys.stderr,
+                )
+
                 result = oci.wait_until(client, client.get_data_asset(result.data.id), 'lifecycle_state', wait_for_state, **wait_period_kwargs)
             except oci.exceptions.MaximumWaitTimeExceeded as e:
                 # If we fail, we should show an error, but we should still provide the information to the customer
@@ -517,7 +541,7 @@ def create_data_asset_data_source_details_object_storage(ctx, from_json, wait_fo
 @data_asset_group.command(name=cli_util.override('anomaly_detection.create_data_asset_data_source_details_influx.command_name', 'create-data-asset-data-source-details-influx'), help=u"""Creates a new DataAsset. \n[Command Reference](createDataAsset)""")
 @cli_util.option('--compartment-id', required=True, help=u"""The OCID for the data asset's compartment.""")
 @cli_util.option('--project-id', required=True, help=u"""The [OCID] of the project to associate with the data asset.""")
-@cli_util.option('--data-source-details-version-specific-details', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--data-source-details-version-specific-details', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=f"""{custom_types.cli_complex_type.COMPLEX_TYPE_HELP}""")
 @cli_util.option('--data-source-details-user-name', required=True, help=u"""Username for connection to Influx""")
 @cli_util.option('--data-source-details-password-secret-id', required=True, help=u"""Password Secret Id for the influx connection""")
 @cli_util.option('--data-source-details-measurement-name', required=True, help=u"""Measurement name for influx""")
@@ -537,13 +561,18 @@ def create_data_asset_data_source_details_object_storage(ctx, from_json, wait_fo
 @cli_util.wrap_exceptions
 def create_data_asset_data_source_details_influx(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, compartment_id, project_id, data_source_details_version_specific_details, data_source_details_user_name, data_source_details_password_secret_id, data_source_details_measurement_name, data_source_details_url, display_name, description, private_endpoint_id, freeform_tags, defined_tags):
 
-    kwargs = {}
-    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    kwargs = {
+        'opc_request_id': cli_util.use_or_generate_request_id(
+            ctx.obj['request_id']
+        )
+    }
 
-    _details = {}
-    _details['dataSourceDetails'] = {}
-    _details['compartmentId'] = compartment_id
-    _details['projectId'] = project_id
+    _details = {
+        'dataSourceDetails': {},
+        'compartmentId': compartment_id,
+        'projectId': project_id,
+    }
+
     _details['dataSourceDetails']['versionSpecificDetails'] = cli_util.parse_json_parameter("data_source_details_version_specific_details", data_source_details_version_specific_details)
     _details['dataSourceDetails']['userName'] = data_source_details_user_name
     _details['dataSourceDetails']['passwordSecretId'] = data_source_details_password_secret_id
@@ -582,7 +611,11 @@ def create_data_asset_data_source_details_influx(ctx, from_json, wait_for_state,
                 if wait_interval_seconds is not None:
                     wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
 
-                click.echo('Action completed. Waiting until the resource has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                click.echo(
+                    f'Action completed. Waiting until the resource has entered state: {wait_for_state}',
+                    file=sys.stderr,
+                )
+
                 result = oci.wait_until(client, client.get_data_asset(result.data.id), 'lifecycle_state', wait_for_state, **wait_period_kwargs)
             except oci.exceptions.MaximumWaitTimeExceeded as e:
                 # If we fail, we should show an error, but we should still provide the information to the customer

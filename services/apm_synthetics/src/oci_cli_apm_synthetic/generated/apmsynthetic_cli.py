@@ -69,7 +69,7 @@ apm_synthetics_root_group.add_command(script_group)
 @cli_util.option('--apm-domain-id', required=True, help=u"""The APM domain ID the request is intended for.""")
 @cli_util.option('--display-name', required=True, help=u"""Unique name that can be edited. The name should not contain any confidential information.""")
 @cli_util.option('--monitor-type', required=True, type=custom_types.CliCaseInsensitiveChoice(["SCRIPTED_BROWSER", "BROWSER", "SCRIPTED_REST", "REST"]), help=u"""Type of monitor.""")
-@cli_util.option('--vantage-points', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""A list of vantage points from which to execute the monitor. Use /publicVantagePoints to fetch public vantage points.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--vantage-points', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=f"""A list of vantage points from which to execute the monitor. Use /publicVantagePoints to fetch public vantage points.{custom_types.cli_complex_type.COMPLEX_TYPE_HELP}""")
 @cli_util.option('--repeat-interval-in-seconds', required=True, type=click.INT, help=u"""Interval in seconds after the start time when the job should be repeated. Minimum repeatIntervalInSeconds should be 300 seconds.""")
 @cli_util.option('--script-id', help=u"""The [OCID] of the script. scriptId is mandatory for creation of SCRIPTED_BROWSER and SCRIPTED_REST monitor types. For other monitor types, it should be set to null.""")
 @cli_util.option('--status', type=custom_types.CliCaseInsensitiveChoice(["ENABLED", "DISABLED", "INVALID"]), help=u"""Enables or disables the monitor.""")
@@ -78,7 +78,7 @@ apm_synthetics_root_group.add_command(script_group)
 @cli_util.option('--script-parameters', type=custom_types.CLI_COMPLEX_TYPE, help=u"""List of script parameters in the monitor. This is valid only for SCRIPTED_BROWSER and SCRIPTED_REST monitor types. For other monitor types, it should be set to null. Example: `[{\"paramName\": \"userid\", \"paramValue\":\"testuser\"}]`
 
 This option is a JSON list with items of type MonitorScriptParameter.  For documentation on MonitorScriptParameter please see our API reference: https://docs.cloud.oracle.com/api/#/en/apmsynthetic/20200630/datatypes/MonitorScriptParameter.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--configuration', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--configuration', type=custom_types.CLI_COMPLEX_TYPE, help=f"""{custom_types.cli_complex_type.COMPLEX_TYPE_HELP}""")
 @cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Simple key-value pair that is applied without any predefined name, type or scope. Exists for cross-compatibility only. Example: `{\"bar-key\": \"value\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--defined-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Defined tags for this resource. Each key is predefined and scoped to a namespace. Example: `{\"foo-namespace\": {\"bar-key\": \"value\"}}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @json_skeleton_utils.get_cli_json_input_option({'vantage-points': {'module': 'apm_synthetics', 'class': 'list[string]'}, 'script-parameters': {'module': 'apm_synthetics', 'class': 'list[MonitorScriptParameter]'}, 'configuration': {'module': 'apm_synthetics', 'class': 'MonitorConfiguration'}, 'freeform-tags': {'module': 'apm_synthetics', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'apm_synthetics', 'class': 'dict(str, dict(str, object))'}})
@@ -88,13 +88,20 @@ This option is a JSON list with items of type MonitorScriptParameter.  For docum
 @cli_util.wrap_exceptions
 def create_monitor(ctx, from_json, apm_domain_id, display_name, monitor_type, vantage_points, repeat_interval_in_seconds, script_id, status, timeout_in_seconds, target, script_parameters, configuration, freeform_tags, defined_tags):
 
-    kwargs = {}
-    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    kwargs = {
+        'opc_request_id': cli_util.use_or_generate_request_id(
+            ctx.obj['request_id']
+        )
+    }
 
-    _details = {}
-    _details['displayName'] = display_name
-    _details['monitorType'] = monitor_type
-    _details['vantagePoints'] = cli_util.parse_json_parameter("vantage_points", vantage_points)
+    _details = {
+        'displayName': display_name,
+        'monitorType': monitor_type,
+        'vantagePoints': cli_util.parse_json_parameter(
+            "vantage_points", vantage_points
+        ),
+    }
+
     _details['repeatIntervalInSeconds'] = repeat_interval_in_seconds
 
     if script_id is not None:
@@ -134,7 +141,7 @@ def create_monitor(ctx, from_json, apm_domain_id, display_name, monitor_type, va
 @cli_util.option('--apm-domain-id', required=True, help=u"""The APM domain ID the request is intended for.""")
 @cli_util.option('--display-name', required=True, help=u"""Unique name that can be edited. The name should not contain any confidential information.""")
 @cli_util.option('--monitor-type', required=True, type=custom_types.CliCaseInsensitiveChoice(["SCRIPTED_BROWSER", "BROWSER", "SCRIPTED_REST", "REST"]), help=u"""Type of monitor.""")
-@cli_util.option('--vantage-points', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""A list of vantage points from which to execute the monitor. Use /publicVantagePoints to fetch public vantage points.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--vantage-points', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=f"""A list of vantage points from which to execute the monitor. Use /publicVantagePoints to fetch public vantage points.{custom_types.cli_complex_type.COMPLEX_TYPE_HELP}""")
 @cli_util.option('--repeat-interval-in-seconds', required=True, type=click.INT, help=u"""Interval in seconds after the start time when the job should be repeated. Minimum repeatIntervalInSeconds should be 300 seconds.""")
 @cli_util.option('--script-id', help=u"""The [OCID] of the script. scriptId is mandatory for creation of SCRIPTED_BROWSER and SCRIPTED_REST monitor types. For other monitor types, it should be set to null.""")
 @cli_util.option('--status', type=custom_types.CliCaseInsensitiveChoice(["ENABLED", "DISABLED", "INVALID"]), help=u"""Enables or disables the monitor.""")
@@ -153,14 +160,21 @@ This option is a JSON list with items of type MonitorScriptParameter.  For docum
 @cli_util.wrap_exceptions
 def create_monitor_scripted_rest_monitor_configuration(ctx, from_json, apm_domain_id, display_name, monitor_type, vantage_points, repeat_interval_in_seconds, script_id, status, timeout_in_seconds, target, script_parameters, freeform_tags, defined_tags, configuration_is_failure_retried):
 
-    kwargs = {}
-    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    kwargs = {
+        'opc_request_id': cli_util.use_or_generate_request_id(
+            ctx.obj['request_id']
+        )
+    }
 
-    _details = {}
-    _details['configuration'] = {}
-    _details['displayName'] = display_name
-    _details['monitorType'] = monitor_type
-    _details['vantagePoints'] = cli_util.parse_json_parameter("vantage_points", vantage_points)
+    _details = {
+        'configuration': {},
+        'displayName': display_name,
+        'monitorType': monitor_type,
+        'vantagePoints': cli_util.parse_json_parameter(
+            "vantage_points", vantage_points
+        ),
+    }
+
     _details['repeatIntervalInSeconds'] = repeat_interval_in_seconds
 
     if script_id is not None:
@@ -202,7 +216,7 @@ def create_monitor_scripted_rest_monitor_configuration(ctx, from_json, apm_domai
 @cli_util.option('--apm-domain-id', required=True, help=u"""The APM domain ID the request is intended for.""")
 @cli_util.option('--display-name', required=True, help=u"""Unique name that can be edited. The name should not contain any confidential information.""")
 @cli_util.option('--monitor-type', required=True, type=custom_types.CliCaseInsensitiveChoice(["SCRIPTED_BROWSER", "BROWSER", "SCRIPTED_REST", "REST"]), help=u"""Type of monitor.""")
-@cli_util.option('--vantage-points', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""A list of vantage points from which to execute the monitor. Use /publicVantagePoints to fetch public vantage points.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--vantage-points', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=f"""A list of vantage points from which to execute the monitor. Use /publicVantagePoints to fetch public vantage points.{custom_types.cli_complex_type.COMPLEX_TYPE_HELP}""")
 @cli_util.option('--repeat-interval-in-seconds', required=True, type=click.INT, help=u"""Interval in seconds after the start time when the job should be repeated. Minimum repeatIntervalInSeconds should be 300 seconds.""")
 @cli_util.option('--script-id', help=u"""The [OCID] of the script. scriptId is mandatory for creation of SCRIPTED_BROWSER and SCRIPTED_REST monitor types. For other monitor types, it should be set to null.""")
 @cli_util.option('--status', type=custom_types.CliCaseInsensitiveChoice(["ENABLED", "DISABLED", "INVALID"]), help=u"""Enables or disables the monitor.""")
@@ -222,14 +236,21 @@ This option is a JSON list with items of type MonitorScriptParameter.  For docum
 @cli_util.wrap_exceptions
 def create_monitor_scripted_browser_monitor_configuration(ctx, from_json, apm_domain_id, display_name, monitor_type, vantage_points, repeat_interval_in_seconds, script_id, status, timeout_in_seconds, target, script_parameters, freeform_tags, defined_tags, configuration_is_failure_retried, configuration_is_certificate_validation_enabled):
 
-    kwargs = {}
-    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    kwargs = {
+        'opc_request_id': cli_util.use_or_generate_request_id(
+            ctx.obj['request_id']
+        )
+    }
 
-    _details = {}
-    _details['configuration'] = {}
-    _details['displayName'] = display_name
-    _details['monitorType'] = monitor_type
-    _details['vantagePoints'] = cli_util.parse_json_parameter("vantage_points", vantage_points)
+    _details = {
+        'configuration': {},
+        'displayName': display_name,
+        'monitorType': monitor_type,
+        'vantagePoints': cli_util.parse_json_parameter(
+            "vantage_points", vantage_points
+        ),
+    }
+
     _details['repeatIntervalInSeconds'] = repeat_interval_in_seconds
 
     if script_id is not None:

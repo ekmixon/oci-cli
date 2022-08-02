@@ -50,9 +50,26 @@ def test_announcements_announce_list(runner, config_file, config_profile):
 def invoke(runner, config_file, config_profile, params, debug=False, root_params=None,
            strip_progress_bar=True, strip_multipart_stderr_output=True, ** args):
     root_params = root_params or []
-    if debug is True:
-        result = runner.invoke(oci_cli.cli, root_params + ['--debug', '--config-file', config_file, '--profile', config_profile] + params, ** args)
-    else:
-        result = runner.invoke(oci_cli.cli, root_params + ['--config-file', config_file, '--profile', config_profile] + params, ** args)
-
-    return result
+    return (
+        runner.invoke(
+            oci_cli.cli,
+            root_params
+            + [
+                '--debug',
+                '--config-file',
+                config_file,
+                '--profile',
+                config_profile,
+            ]
+            + params,
+            **args
+        )
+        if debug is True
+        else runner.invoke(
+            oci_cli.cli,
+            root_params
+            + ['--config-file', config_file, '--profile', config_profile]
+            + params,
+            **args
+        )
+    )

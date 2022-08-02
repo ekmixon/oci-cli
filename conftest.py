@@ -61,9 +61,7 @@ def add_test_option(parser, option, action, default, help):
         parser.addoption(option, action=action, default=default, help=help)
     except ValueError as ve:
         # ValueError: option names {'--fast'} already added
-        if 'already added' in str(ve):
-            pass
-        else:
+        if 'already added' not in str(ve):
             raise ve
 
 
@@ -80,24 +78,32 @@ def move_cli_config_rc_file():
     moved_rc_fallback_file = False
 
     if os.path.exists(expanded_rc_location):
-        os.rename(expanded_rc_location, '{}.moved'.format(expanded_rc_location))
-        print('Moved: {}'.format(expanded_rc_location))
+        os.rename(expanded_rc_location, f'{expanded_rc_location}.moved')
+        print(f'Moved: {expanded_rc_location}')
         moved_rc_file = True
 
     if os.path.exists(expanded_rc_fallback_location):
-        os.rename(expanded_rc_fallback_location, '{}.moved'.format(expanded_rc_fallback_location))
-        print('Moved: {}'.format(expanded_rc_fallback_location))
+        os.rename(
+            expanded_rc_fallback_location,
+            f'{expanded_rc_fallback_location}.moved',
+        )
+
+        print(f'Moved: {expanded_rc_fallback_location}')
         moved_rc_fallback_file = True
 
     yield
 
     if moved_rc_file:
-        os.rename('{}.moved'.format(expanded_rc_location), expanded_rc_location)
-        print('Moved Back: {}'.format(expanded_rc_location))
+        os.rename(f'{expanded_rc_location}.moved', expanded_rc_location)
+        print(f'Moved Back: {expanded_rc_location}')
 
     if moved_rc_fallback_file:
-        os.rename('{}.moved'.format(expanded_rc_fallback_location), expanded_rc_fallback_location)
-        print('Moved Back: {}'.format(expanded_rc_fallback_location))
+        os.rename(
+            f'{expanded_rc_fallback_location}.moved',
+            expanded_rc_fallback_location,
+        )
+
+        print(f'Moved Back: {expanded_rc_fallback_location}')
 
 
 @pytest.fixture(scope='session')
@@ -113,18 +119,17 @@ def malformed_config_file(config):
 
     malformed_config_file_path = os.path.join(get_resource_directory(), 'malformed_config')
     with open(malformed_config_file_path, 'w+') as f:
-        for key in sections:
+        for key, field_to_skip in sections.items():
             f.write('\n\n')
-            f.write('[{}]\n'.format(key))
-            field_to_skip = sections[key]
+            f.write(f'[{key}]\n')
             for valid_config_key in config:
                 if valid_config_key != field_to_skip:
-                    f.write('{} = {}\n'.format(valid_config_key, config[valid_config_key]))
+                    f.write(f'{valid_config_key} = {config[valid_config_key]}\n')
 
         # write SPECIFY BAD ENDPOINT SECTION
         f.write('[SPECIFY_BAD_ENDPOINT]\n')
         for valid_config_key in config:
-            f.write('{} = {}\n'.format(valid_config_key, config[valid_config_key]))
+            f.write(f'{valid_config_key} = {config[valid_config_key]}\n')
         f.write('endpoint = https://notaservice.us-phoenix-1.oraclecloud.com')
 
     yield malformed_config_file_path
@@ -146,8 +151,7 @@ def config_profile(request):
 @pytest.fixture(scope='session')
 def config(config_file, config_profile):
     config = oci.config.from_file(file_location=config_file, profile_name=config_profile)
-    pass_phrase = os.environ.get('PYTHON_CLI_ADMIN_PASS_PHRASE')
-    if pass_phrase:
+    if pass_phrase := os.environ.get('PYTHON_CLI_ADMIN_PASS_PHRASE'):
         config['pass_phrase'] = pass_phrase
     return config
 
@@ -243,7 +247,7 @@ def get_config_profiles(config_file):
     expanded_file_location = os.path.expandvars(os.path.expanduser(config_file))
     config = configparser.ConfigParser(interpolation=None)
     if not config.read(expanded_file_location):
-        raise IOError("No such file or directory: {}".format(expanded_file_location))
+        raise IOError(f"No such file or directory: {expanded_file_location}")
     config_profiles = config.sections()
     # The 'DEFAULT' section is not returned as part of sections() call so we need to add it if present in config object.
     if 'DEFAULT' in config:
@@ -413,9 +417,9 @@ def vcn_and_subnets(network_client):
 @pytest.fixture(scope='session')
 def tag_namespace_and_tags(identity_client, test_id):
     with test_config_container.create_vcr().use_cassette('_conftest_fixture_tag_namespace_and_tags.yml',
-                                                         match_on=['method', 'scheme', 'host', 'port', 'vcr_query_matcher']):
+                                                             match_on=['method', 'scheme', 'host', 'port', 'vcr_query_matcher']):
         if not os.environ.get('OCI_CLI_TAG_NAMESPACE_ID'):
-            tag_namespace_name = 'cli_tag_ns_{}'.format(test_id)
+            tag_namespace_name = f'cli_tag_ns_{test_id}'
             create_tag_namespace_response = identity_client.create_tag_namespace(
                 oci.identity.models.CreateTagNamespaceDetails(
                     compartment_id=os.environ['OCI_CLI_COMPARTMENT_ID'],
@@ -426,7 +430,7 @@ def tag_namespace_and_tags(identity_client, test_id):
 
             tag_namespace = create_tag_namespace_response.data
         else:
-            print('Reusing tag namespace: {}'.format(os.environ.get('OCI_CLI_TAG_NAMESPACE_ID')))
+            print(f"Reusing tag namespace: {os.environ.get('OCI_CLI_TAG_NAMESPACE_ID')}")
             get_tag_namespace_response = identity_client.get_tag_namespace(os.environ.get('OCI_CLI_TAG_NAMESPACE_ID'))
 
             if get_tag_namespace_response.data.is_retired:
@@ -440,25 +444,25 @@ def tag_namespace_and_tags(identity_client, test_id):
 
         tags = []
         if not os.environ.get('OCI_CLI_TAG_ONE_NAME'):
-            tag_one_name = 'cli_tag_{}'.format(test_id)
+            tag_one_name = f'cli_tag_{test_id}'
             create_tag_response = identity_client.create_tag(
                 tag_namespace.id,
                 oci.identity.models.CreateTagDetails(name=tag_one_name, description='CLI integration test tag')
             )
             tags.append(create_tag_response.data)
         else:
-            print('Reusing tag: {}'.format(os.environ.get('OCI_CLI_TAG_ONE_NAME')))
+            print(f"Reusing tag: {os.environ.get('OCI_CLI_TAG_ONE_NAME')}")
             tags.append(get_and_reactivate_tag(identity_client, tag_namespace, os.environ.get('OCI_CLI_TAG_ONE_NAME')))
 
         if not os.environ.get('OCI_CLI_TAG_TWO_NAME'):
-            tag_two_name = 'cli_tag2_{}'.format(test_id)
+            tag_two_name = f'cli_tag2_{test_id}'
             create_tag_response = identity_client.create_tag(
                 tag_namespace.id,
                 oci.identity.models.CreateTagDetails(name=tag_two_name, description='CLI integration test tag')
             )
             tags.append(create_tag_response.data)
         else:
-            print('Reusing tag: {}'.format(os.environ.get('OCI_CLI_TAG_TWO_NAME')))
+            print(f"Reusing tag: {os.environ.get('OCI_CLI_TAG_TWO_NAME')}")
             tags.append(get_and_reactivate_tag(identity_client, tag_namespace, os.environ.get('OCI_CLI_TAG_TWO_NAME')))
 
         # Avoid eventual consistency issue where we try and use tags we just created and get a 404 (though it

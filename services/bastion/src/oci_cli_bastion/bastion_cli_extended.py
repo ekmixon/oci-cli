@@ -21,8 +21,8 @@ cli_util.rename_command(bastion_cli, bastion_cli.session_group,
                                              params_to_exclude=['max_session_ttl_in_seconds', 'static_jump_host_ip_addresses', 'client_cidr_block_allow_list'])
 @bastion_cli.bastion_group.command(name='create', help=bastion_cli.create_bastion.help)
 @cli_util.option('--max-session-ttl', type=click.INT, help="""Max TTL of the sessions on the bastion in seconds.""")
-@cli_util.option('--jump-host-ips', type=custom_types.CLI_COMPLEX_TYPE, help=u"""the ip addresses of the hosts that the bastion has access to.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--client-cidr-list', type=custom_types.CLI_COMPLEX_TYPE, help=u"""the ip ranges that the bastion has access to.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--jump-host-ips', type=custom_types.CLI_COMPLEX_TYPE, help=f"""the ip addresses of the hosts that the bastion has access to.{custom_types.cli_complex_type.COMPLEX_TYPE_HELP}""")
+@cli_util.option('--client-cidr-list', type=custom_types.CLI_COMPLEX_TYPE, help=f"""the ip ranges that the bastion has access to.{custom_types.cli_complex_type.COMPLEX_TYPE_HELP}""")
 @click.pass_context
 @json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'jump-host-ips': {'module': 'bastion', 'class': 'list[string]'}, 'client-cidr-list': {'module': 'bastion', 'class': 'list[string]'}, 'freeform-tags': {'module': 'bastion', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'bastion', 'class': 'dict(str, dict(str, object))'}}, output_type={'module': 'bastion', 'class': 'Bastion'})
 @cli_util.wrap_exceptions
@@ -44,8 +44,8 @@ def create_bastion(ctx, **kwargs):
                                              params_to_exclude=['max_session_ttl_in_seconds', 'static_jump_host_ip_addresses', 'client_cidr_block_allow_list'])
 @bastion_cli.bastion_group.command(name='update', help=bastion_cli.update_bastion.help)
 @cli_util.option('--max-session-ttl', type=click.INT, help="""Max TTL in seconds of the sessions on the bastion.""")
-@cli_util.option('--jump-host-ips', type=custom_types.CLI_COMPLEX_TYPE, help=u"""the ip addresses of the hosts that the bastion has access to.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--client-cidr-list', type=custom_types.CLI_COMPLEX_TYPE, help=u"""the ip ranges that the bastion has access to.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--jump-host-ips', type=custom_types.CLI_COMPLEX_TYPE, help=f"""the ip addresses of the hosts that the bastion has access to.{custom_types.cli_complex_type.COMPLEX_TYPE_HELP}""")
+@cli_util.option('--client-cidr-list', type=custom_types.CLI_COMPLEX_TYPE, help=f"""the ip ranges that the bastion has access to.{custom_types.cli_complex_type.COMPLEX_TYPE_HELP}""")
 @click.pass_context
 @json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'jump-host-ips': {'module': 'bastion', 'class': 'list[string]'}, 'client-cidr-list': {'module': 'bastion', 'class': 'list[string]'}, 'freeform-tags': {'module': 'bastion', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'bastion', 'class': 'dict(str, dict(str, object))'}})
 @cli_util.wrap_exceptions
@@ -76,7 +76,7 @@ def create_session(ctx, **kwargs):
         key_details['publicKeyContent'] = kwargs['ssh_public_key_file'].read()
         kwargs.pop('ssh_public_key_file')
 
-    if len(key_details) > 0:
+    if key_details:
         kwargs['key_details'] = json.dumps(key_details)
     # Invoke base method "create_bastion"
     ctx.invoke(bastion_cli.create_session, **kwargs)
@@ -128,7 +128,7 @@ def create_managed_ssh(ctx, **kwargs):
         key_details['publicKeyContent'] = kwargs['ssh_public_key_file'].read()
         kwargs.pop('ssh_public_key_file')
 
-    if len(key_details) > 0:
+    if key_details:
         kwargs['key_details'] = json.dumps(key_details)
 
     # Invoke base method
@@ -175,7 +175,7 @@ def create_port_forwarding(ctx, **kwargs):
         key_details['publicKeyContent'] = kwargs['ssh_public_key_file'].read()
         kwargs.pop('ssh_public_key_file')
 
-    if len(key_details) > 0:
+    if key_details:
         kwargs['key_details'] = json.dumps(key_details)
 
     # Invoke base method

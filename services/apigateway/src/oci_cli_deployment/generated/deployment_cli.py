@@ -62,9 +62,7 @@ def change_deployment_compartment(ctx, from_json, wait_for_state, max_wait_secon
         kwargs['if_match'] = if_match
     kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
 
-    _details = {}
-    _details['compartmentId'] = compartment_id
-
+    _details = {'compartmentId': compartment_id}
     client = cli_util.build_client('apigateway', 'deployment', ctx)
     result = client.change_deployment_compartment(
         deployment_id=deployment_id,
@@ -83,7 +81,11 @@ def change_deployment_compartment(ctx, from_json, wait_for_state, max_wait_secon
                 if wait_interval_seconds is not None:
                     wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
 
-                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                click.echo(
+                    f'Action completed. Waiting until the work request has entered state: {wait_for_state}',
+                    file=sys.stderr,
+                )
+
                 result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
             except oci.exceptions.MaximumWaitTimeExceeded as e:
                 # If we fail, we should show an error, but we should still provide the information to the customer
@@ -106,7 +108,7 @@ def change_deployment_compartment(ctx, from_json, wait_for_state, max_wait_secon
 @cli_util.option('--display-name', help=u"""A user-friendly name. Does not have to be unique, and it's changeable. Avoid entering confidential information.
 
 Example: `My new resource`""")
-@cli_util.option('--specification', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--specification', type=custom_types.CLI_COMPLEX_TYPE, help=f"""{custom_types.cli_complex_type.COMPLEX_TYPE_HELP}""")
 @cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Free-form tags for this resource. Each tag is a simple key-value pair with no predefined name, type, or namespace. For more information, see [Resource Tags].
 
 Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
@@ -123,13 +125,17 @@ Example: `{\"Operations\": {\"CostCenter\": \"42\"}}`""" + custom_types.cli_comp
 @cli_util.wrap_exceptions
 def create_deployment(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, gateway_id, compartment_id, path_prefix, display_name, specification, freeform_tags, defined_tags):
 
-    kwargs = {}
-    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    kwargs = {
+        'opc_request_id': cli_util.use_or_generate_request_id(
+            ctx.obj['request_id']
+        )
+    }
 
-    _details = {}
-    _details['gatewayId'] = gateway_id
-    _details['compartmentId'] = compartment_id
-    _details['pathPrefix'] = path_prefix
+    _details = {
+        'gatewayId': gateway_id,
+        'compartmentId': compartment_id,
+        'pathPrefix': path_prefix,
+    }
 
     if display_name is not None:
         _details['displayName'] = display_name
@@ -160,7 +166,11 @@ def create_deployment(ctx, from_json, wait_for_state, max_wait_seconds, wait_int
                 if wait_interval_seconds is not None:
                     wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
 
-                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                click.echo(
+                    f'Action completed. Waiting until the work request has entered state: {wait_for_state}',
+                    file=sys.stderr,
+                )
+
                 result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
             except oci.exceptions.MaximumWaitTimeExceeded as e:
                 # If we fail, we should show an error, but we should still provide the information to the customer
@@ -214,7 +224,11 @@ def delete_deployment(ctx, from_json, wait_for_state, max_wait_seconds, wait_int
                 if wait_interval_seconds is not None:
                     wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
 
-                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                click.echo(
+                    f'Action completed. Waiting until the work request has entered state: {wait_for_state}',
+                    file=sys.stderr,
+                )
+
                 result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
             except oci.exceptions.MaximumWaitTimeExceeded as e:
                 # If we fail, we should show an error, but we should still provide the information to the customer
@@ -242,8 +256,12 @@ def get_deployment(ctx, from_json, deployment_id):
     if isinstance(deployment_id, six.string_types) and len(deployment_id.strip()) == 0:
         raise click.UsageError('Parameter --deployment-id cannot be whitespace or empty string')
 
-    kwargs = {}
-    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    kwargs = {
+        'opc_request_id': cli_util.use_or_generate_request_id(
+            ctx.obj['request_id']
+        )
+    }
+
     client = cli_util.build_client('apigateway', 'deployment', ctx)
     result = client.get_deployment(
         deployment_id=deployment_id,
@@ -324,7 +342,7 @@ def list_deployments(ctx, from_json, all_pages, page_size, compartment_id, gatew
 @cli_util.option('--display-name', help=u"""A user-friendly name. Does not have to be unique, and it's changeable. Avoid entering confidential information.
 
 Example: `My new resource`""")
-@cli_util.option('--specification', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--specification', type=custom_types.CLI_COMPLEX_TYPE, help=f"""{custom_types.cli_complex_type.COMPLEX_TYPE_HELP}""")
 @cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Free-form tags for this resource. Each tag is a simple key-value pair with no predefined name, type, or namespace. For more information, see [Resource Tags].
 
 Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
@@ -345,10 +363,14 @@ def update_deployment(ctx, from_json, force, wait_for_state, max_wait_seconds, w
 
     if isinstance(deployment_id, six.string_types) and len(deployment_id.strip()) == 0:
         raise click.UsageError('Parameter --deployment-id cannot be whitespace or empty string')
-    if not force:
-        if specification or freeform_tags or defined_tags:
-            if not click.confirm("WARNING: Updates to specification and freeform-tags and defined-tags will replace any existing values. Are you sure you want to continue?"):
-                ctx.abort()
+    if (
+        not force
+        and (specification or freeform_tags or defined_tags)
+        and not click.confirm(
+            "WARNING: Updates to specification and freeform-tags and defined-tags will replace any existing values. Are you sure you want to continue?"
+        )
+    ):
+        ctx.abort()
 
     kwargs = {}
     if if_match is not None:
@@ -387,7 +409,11 @@ def update_deployment(ctx, from_json, force, wait_for_state, max_wait_seconds, w
                 if wait_interval_seconds is not None:
                     wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
 
-                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                click.echo(
+                    f'Action completed. Waiting until the work request has entered state: {wait_for_state}',
+                    file=sys.stderr,
+                )
+
                 result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
             except oci.exceptions.MaximumWaitTimeExceeded as e:
                 # If we fail, we should show an error, but we should still provide the information to the customer

@@ -43,8 +43,8 @@ def update_configuration(ctx, **kwargs):
 @audit_cli.audit_event_group.command(name='list', help=audit_cli.list_events.help)
 @cli_util.option('--skip-deserialization', 'skip_deserialization', is_flag=True, help="""Skips deserializing service response into python sdk response models and returns as plain JSON object.""")
 @cli_util.option('--stream-output', 'stream_output', is_flag=True, help="""Print output to stdout as it is fetched so the full response is not stored in memory. This only works with --all.""")
-@cli_util.option('--start-time', required=True, type=custom_types.CLI_DATETIME, help=u"""Returns events that were processed at or after this start date and time, expressed in [RFC 3339] timestamp format. For example, a start value of `2017-01-15T11:30:00Z` will retrieve a list of all events processed since 30 minutes after the 11th hour of January 15, 2017, in Coordinated Universal Time (UTC). You can specify a value with granularity to the minute. Seconds (and milliseconds, if included) must be set to `0`.""" + custom_types.CLI_DATETIME.VALID_DATETIME_CLI_HELP_MESSAGE)
-@cli_util.option('--end-time', required=True, type=custom_types.CLI_DATETIME, help=u"""Returns events that were processed before this end date and time, expressed in [RFC 3339] timestamp format. For example, a start value of `2017-01-01T00:00:00Z` and an end value of `2017-01-02T00:00:00Z` will retrieve a list of all events processed on January 1, 2017. Similarly, a start value of `2017-01-01T00:00:00Z` and an end value of `2017-02-01T00:00:00Z` will result in a list of all events processed between January 1, 2017 and January 31, 2017. You can specify a value with granularity to the minute. Seconds (and milliseconds, if included) must be set to `0`.""" + custom_types.CLI_DATETIME.VALID_DATETIME_CLI_HELP_MESSAGE)
+@cli_util.option('--start-time', required=True, type=custom_types.CLI_DATETIME, help=f"""Returns events that were processed at or after this start date and time, expressed in [RFC 3339] timestamp format. For example, a start value of `2017-01-15T11:30:00Z` will retrieve a list of all events processed since 30 minutes after the 11th hour of January 15, 2017, in Coordinated Universal Time (UTC). You can specify a value with granularity to the minute. Seconds (and milliseconds, if included) must be set to `0`.{custom_types.CLI_DATETIME.VALID_DATETIME_CLI_HELP_MESSAGE}""")
+@cli_util.option('--end-time', required=True, type=custom_types.CLI_DATETIME, help=f"""Returns events that were processed before this end date and time, expressed in [RFC 3339] timestamp format. For example, a start value of `2017-01-01T00:00:00Z` and an end value of `2017-01-02T00:00:00Z` will retrieve a list of all events processed on January 1, 2017. Similarly, a start value of `2017-01-01T00:00:00Z` and an end value of `2017-02-01T00:00:00Z` will result in a list of all events processed between January 1, 2017 and January 31, 2017. You can specify a value with granularity to the minute. Seconds (and milliseconds, if included) must be set to `0`.{custom_types.CLI_DATETIME.VALID_DATETIME_CLI_HELP_MESSAGE}""")
 @click.pass_context
 @json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={})
 @cli_util.wrap_exceptions
@@ -95,8 +95,16 @@ def list_events(ctx, from_json, all_pages, compartment_id, start_time, end_time,
         if ctx.obj['debug']:
             print("", file=sys.stderr)
             end_render = timer()
-            print("Time elapsed for total rendering response: {}".format(end_render - start_render), file=sys.stderr)
+            print(
+                f"Time elapsed for total rendering response: {end_render - start_render}",
+                file=sys.stderr,
+            )
+
     if ctx.obj['debug']:
         end_command = timer()
-        print("Time elapsed for total command execution: {}".format(end_command - start_command), file=sys.stderr)
+        print(
+            f"Time elapsed for total command execution: {end_command - start_command}",
+            file=sys.stderr,
+        )
+
         cli_util.output_memory('total memory usage after command execution: ')

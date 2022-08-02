@@ -115,9 +115,7 @@ def update_configuration(ctx, from_json, wait_for_state, max_wait_seconds, wait_
 
     kwargs = {}
 
-    _details = {}
-    _details['retentionPeriodDays'] = retention_period_days
-
+    _details = {'retentionPeriodDays': retention_period_days}
     client = cli_util.build_client('audit', 'audit', ctx)
     result = client.update_configuration(
         compartment_id=compartment_id,
@@ -134,7 +132,11 @@ def update_configuration(ctx, from_json, wait_for_state, max_wait_seconds, wait_
                 if wait_interval_seconds is not None:
                     wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
 
-                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                click.echo(
+                    f'Action completed. Waiting until the work request has entered state: {wait_for_state}',
+                    file=sys.stderr,
+                )
+
                 result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
             except oci.exceptions.MaximumWaitTimeExceeded as e:
                 # If we fail, we should show an error, but we should still provide the information to the customer

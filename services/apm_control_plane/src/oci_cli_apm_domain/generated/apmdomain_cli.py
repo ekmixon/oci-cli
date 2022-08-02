@@ -81,9 +81,7 @@ def change_apm_domain_compartment(ctx, from_json, wait_for_state, max_wait_secon
         kwargs['if_match'] = if_match
     kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
 
-    _details = {}
-    _details['compartmentId'] = compartment_id
-
+    _details = {'compartmentId': compartment_id}
     client = cli_util.build_client('apm_control_plane', 'apm_domain', ctx)
     result = client.change_apm_domain_compartment(
         apm_domain_id=apm_domain_id,
@@ -100,7 +98,11 @@ def change_apm_domain_compartment(ctx, from_json, wait_for_state, max_wait_secon
                 if wait_interval_seconds is not None:
                     wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
 
-                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                click.echo(
+                    f'Action completed. Waiting until the work request has entered state: {wait_for_state}',
+                    file=sys.stderr,
+                )
+
                 result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
             except oci.exceptions.MaximumWaitTimeExceeded as e:
                 # If we fail, we should show an error, but we should still provide the information to the customer
@@ -133,13 +135,13 @@ def change_apm_domain_compartment(ctx, from_json, wait_for_state, max_wait_secon
 @cli_util.wrap_exceptions
 def create_apm_domain(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, display_name, compartment_id, description, freeform_tags, defined_tags, is_free_tier):
 
-    kwargs = {}
-    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    kwargs = {
+        'opc_request_id': cli_util.use_or_generate_request_id(
+            ctx.obj['request_id']
+        )
+    }
 
-    _details = {}
-    _details['displayName'] = display_name
-    _details['compartmentId'] = compartment_id
-
+    _details = {'displayName': display_name, 'compartmentId': compartment_id}
     if description is not None:
         _details['description'] = description
 
@@ -167,7 +169,11 @@ def create_apm_domain(ctx, from_json, wait_for_state, max_wait_seconds, wait_int
                 if wait_interval_seconds is not None:
                     wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
 
-                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                click.echo(
+                    f'Action completed. Waiting until the work request has entered state: {wait_for_state}',
+                    file=sys.stderr,
+                )
+
                 result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
             except oci.exceptions.MaximumWaitTimeExceeded as e:
                 # If we fail, we should show an error, but we should still provide the information to the customer
@@ -219,7 +225,11 @@ def delete_apm_domain(ctx, from_json, wait_for_state, max_wait_seconds, wait_int
                 if wait_interval_seconds is not None:
                     wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
 
-                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                click.echo(
+                    f'Action completed. Waiting until the work request has entered state: {wait_for_state}',
+                    file=sys.stderr,
+                )
+
                 result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
             except oci.exceptions.MaximumWaitTimeExceeded as e:
                 # If we fail, we should show an error, but we should still provide the information to the customer
@@ -236,7 +246,7 @@ def delete_apm_domain(ctx, from_json, wait_for_state, max_wait_seconds, wait_int
 
 
 @data_key_group.command(name=cli_util.override('apm_control_plane.generate_data_keys.command_name', 'generate'), help=u"""Generates a set of new Data Keys for the specified APM domain with the specified names and types. These will be added to the existing set of Data Keys for the specified APM domain. \n[Command Reference](generateDataKeys)""")
-@cli_util.option('--generate-data-keys-list-details', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""List of new Data Keys to be generated.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--generate-data-keys-list-details', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=f"""List of new Data Keys to be generated.{custom_types.cli_complex_type.COMPLEX_TYPE_HELP}""")
 @cli_util.option('--apm-domain-id', required=True, help=u"""OCID of the APM Domain""")
 @cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource. The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
 @cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "IN_PROGRESS", "FAILED", "SUCCEEDED", "CANCELING", "CANCELED"]), multiple=True, help="""This operation asynchronously creates, modifies or deletes a resource and uses a work request to track the progress of the operation. Specify this option to perform the action and then wait until the work request reaches a certain state. Multiple states can be specified, returning on the first state. For example, --wait-for-state SUCCEEDED --wait-for-state FAILED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
@@ -272,7 +282,11 @@ def generate_data_keys(ctx, from_json, wait_for_state, max_wait_seconds, wait_in
                 if wait_interval_seconds is not None:
                     wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
 
-                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                click.echo(
+                    f'Action completed. Waiting until the work request has entered state: {wait_for_state}',
+                    file=sys.stderr,
+                )
+
                 result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
             except oci.exceptions.MaximumWaitTimeExceeded as e:
                 # If we fail, we should show an error, but we should still provide the information to the customer
@@ -300,8 +314,12 @@ def get_apm_domain(ctx, from_json, apm_domain_id):
     if isinstance(apm_domain_id, six.string_types) and len(apm_domain_id.strip()) == 0:
         raise click.UsageError('Parameter --apm-domain-id cannot be whitespace or empty string')
 
-    kwargs = {}
-    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    kwargs = {
+        'opc_request_id': cli_util.use_or_generate_request_id(
+            ctx.obj['request_id']
+        )
+    }
+
     client = cli_util.build_client('apm_control_plane', 'apm_domain', ctx)
     result = client.get_apm_domain(
         apm_domain_id=apm_domain_id,
@@ -322,8 +340,12 @@ def get_work_request(ctx, from_json, work_request_id):
     if isinstance(work_request_id, six.string_types) and len(work_request_id.strip()) == 0:
         raise click.UsageError('Parameter --work-request-id cannot be whitespace or empty string')
 
-    kwargs = {}
-    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    kwargs = {
+        'opc_request_id': cli_util.use_or_generate_request_id(
+            ctx.obj['request_id']
+        )
+    }
+
     client = cli_util.build_client('apm_control_plane', 'apm_domain', ctx)
     result = client.get_work_request(
         work_request_id=work_request_id,
@@ -345,8 +367,12 @@ def list_apm_domain_work_requests(ctx, from_json, all_pages, apm_domain_id):
     if isinstance(apm_domain_id, six.string_types) and len(apm_domain_id.strip()) == 0:
         raise click.UsageError('Parameter --apm-domain-id cannot be whitespace or empty string')
 
-    kwargs = {}
-    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    kwargs = {
+        'opc_request_id': cli_util.use_or_generate_request_id(
+            ctx.obj['request_id']
+        )
+    }
+
     client = cli_util.build_client('apm_control_plane', 'apm_domain', ctx)
     result = client.list_apm_domain_work_requests(
         apm_domain_id=apm_domain_id,
@@ -593,7 +619,7 @@ def list_work_requests(ctx, from_json, all_pages, page_size, compartment_id, pag
 
 @data_key_group.command(name=cli_util.override('apm_control_plane.remove_data_keys.command_name', 'remove'), help=u"""Removes the set of specified Data Keys from the specified APM domain. Agents would no longer be able to use these data keys to upload to the APM domain once this operation is completed. \n[Command Reference](removeDataKeys)""")
 @cli_util.option('--apm-domain-id', required=True, help=u"""OCID of the APM Domain""")
-@cli_util.option('--remove-data-keys-list-details', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""List of Data Keys to be removed.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--remove-data-keys-list-details', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=f"""List of Data Keys to be removed.{custom_types.cli_complex_type.COMPLEX_TYPE_HELP}""")
 @cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource. The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
 @cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "IN_PROGRESS", "FAILED", "SUCCEEDED", "CANCELING", "CANCELED"]), multiple=True, help="""This operation asynchronously creates, modifies or deletes a resource and uses a work request to track the progress of the operation. Specify this option to perform the action and then wait until the work request reaches a certain state. Multiple states can be specified, returning on the first state. For example, --wait-for-state SUCCEEDED --wait-for-state FAILED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
 @cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the work request to reach the state defined by --wait-for-state. Defaults to 1200 seconds.""")
@@ -628,7 +654,11 @@ def remove_data_keys(ctx, from_json, wait_for_state, max_wait_seconds, wait_inte
                 if wait_interval_seconds is not None:
                     wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
 
-                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                click.echo(
+                    f'Action completed. Waiting until the work request has entered state: {wait_for_state}',
+                    file=sys.stderr,
+                )
+
                 result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
             except oci.exceptions.MaximumWaitTimeExceeded as e:
                 # If we fail, we should show an error, but we should still provide the information to the customer
@@ -664,10 +694,14 @@ def update_apm_domain(ctx, from_json, force, wait_for_state, max_wait_seconds, w
 
     if isinstance(apm_domain_id, six.string_types) and len(apm_domain_id.strip()) == 0:
         raise click.UsageError('Parameter --apm-domain-id cannot be whitespace or empty string')
-    if not force:
-        if freeform_tags or defined_tags:
-            if not click.confirm("WARNING: Updates to freeform-tags and defined-tags will replace any existing values. Are you sure you want to continue?"):
-                ctx.abort()
+    if (
+        not force
+        and (freeform_tags or defined_tags)
+        and not click.confirm(
+            "WARNING: Updates to freeform-tags and defined-tags will replace any existing values. Are you sure you want to continue?"
+        )
+    ):
+        ctx.abort()
 
     kwargs = {}
     if if_match is not None:
@@ -704,7 +738,11 @@ def update_apm_domain(ctx, from_json, force, wait_for_state, max_wait_seconds, w
                 if wait_interval_seconds is not None:
                     wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
 
-                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                click.echo(
+                    f'Action completed. Waiting until the work request has entered state: {wait_for_state}',
+                    file=sys.stderr,
+                )
+
                 result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
             except oci.exceptions.MaximumWaitTimeExceeded as e:
                 # If we fail, we should show an error, but we should still provide the information to the customer

@@ -56,7 +56,7 @@ bds_root_group.add_command(work_request_group)
 @cli_util.option('--node-type', required=True, help=u"""A node type that is managed by an autoscale configuration. The only supported type is WORKER.""")
 @cli_util.option('--is-enabled', required=True, type=click.BOOL, help=u"""Whether the autoscale configuration is enabled.""")
 @cli_util.option('--cluster-admin-password', required=True, help=u"""Base-64 encoded password for the cluster (and Cloudera Manager) admin user.""")
-@cli_util.option('--policy', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--policy', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=f"""{custom_types.cli_complex_type.COMPLEX_TYPE_HELP}""")
 @cli_util.option('--display-name', help=u"""A user-friendly name. The name does not have to be unique, and it may be changed. Avoid entering confidential information.""")
 @cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource. The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
 @cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "IN_PROGRESS", "FAILED", "SUCCEEDED", "CANCELING", "CANCELED"]), multiple=True, help="""This operation asynchronously creates, modifies or deletes a resource and uses a work request to track the progress of the operation. Specify this option to perform the action and then wait until the work request reaches a certain state. Multiple states can be specified, returning on the first state. For example, --wait-for-state SUCCEEDED --wait-for-state FAILED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
@@ -77,11 +77,12 @@ def add_auto_scaling_configuration(ctx, from_json, wait_for_state, max_wait_seco
         kwargs['if_match'] = if_match
     kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
 
-    _details = {}
-    _details['nodeType'] = node_type
-    _details['isEnabled'] = is_enabled
-    _details['clusterAdminPassword'] = cluster_admin_password
-    _details['policy'] = cli_util.parse_json_parameter("policy", policy)
+    _details = {
+        'nodeType': node_type,
+        'isEnabled': is_enabled,
+        'clusterAdminPassword': cluster_admin_password,
+        'policy': cli_util.parse_json_parameter("policy", policy),
+    }
 
     if display_name is not None:
         _details['displayName'] = display_name
@@ -102,7 +103,11 @@ def add_auto_scaling_configuration(ctx, from_json, wait_for_state, max_wait_seco
                 if wait_interval_seconds is not None:
                     wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
 
-                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                click.echo(
+                    f'Action completed. Waiting until the work request has entered state: {wait_for_state}',
+                    file=sys.stderr,
+                )
+
                 result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
             except oci.exceptions.MaximumWaitTimeExceeded as e:
                 # If we fail, we should show an error, but we should still provide the information to the customer
@@ -141,9 +146,10 @@ def add_block_storage(ctx, from_json, wait_for_state, max_wait_seconds, wait_int
         kwargs['if_match'] = if_match
     kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
 
-    _details = {}
-    _details['clusterAdminPassword'] = cluster_admin_password
-    _details['blockVolumeSizeInGBs'] = block_volume_size_in_gbs
+    _details = {
+        'clusterAdminPassword': cluster_admin_password,
+        'blockVolumeSizeInGBs': block_volume_size_in_gbs,
+    }
 
     client = cli_util.build_client('bds', 'bds', ctx)
     result = client.add_block_storage(
@@ -161,7 +167,11 @@ def add_block_storage(ctx, from_json, wait_for_state, max_wait_seconds, wait_int
                 if wait_interval_seconds is not None:
                     wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
 
-                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                click.echo(
+                    f'Action completed. Waiting until the work request has entered state: {wait_for_state}',
+                    file=sys.stderr,
+                )
+
                 result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
             except oci.exceptions.MaximumWaitTimeExceeded as e:
                 # If we fail, we should show an error, but we should still provide the information to the customer
@@ -201,10 +211,7 @@ def add_cloud_sql(ctx, from_json, wait_for_state, max_wait_seconds, wait_interva
         kwargs['if_match'] = if_match
     kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
 
-    _details = {}
-    _details['shape'] = shape
-    _details['clusterAdminPassword'] = cluster_admin_password
-
+    _details = {'shape': shape, 'clusterAdminPassword': cluster_admin_password}
     if block_volume_size_in_gbs is not None:
         _details['blockVolumeSizeInGBs'] = block_volume_size_in_gbs
 
@@ -224,7 +231,11 @@ def add_cloud_sql(ctx, from_json, wait_for_state, max_wait_seconds, wait_interva
                 if wait_interval_seconds is not None:
                     wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
 
-                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                click.echo(
+                    f'Action completed. Waiting until the work request has entered state: {wait_for_state}',
+                    file=sys.stderr,
+                )
+
                 result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
             except oci.exceptions.MaximumWaitTimeExceeded as e:
                 # If we fail, we should show an error, but we should still provide the information to the customer
@@ -263,9 +274,10 @@ def add_worker_nodes(ctx, from_json, wait_for_state, max_wait_seconds, wait_inte
         kwargs['if_match'] = if_match
     kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
 
-    _details = {}
-    _details['clusterAdminPassword'] = cluster_admin_password
-    _details['numberOfWorkerNodes'] = number_of_worker_nodes
+    _details = {
+        'clusterAdminPassword': cluster_admin_password,
+        'numberOfWorkerNodes': number_of_worker_nodes,
+    }
 
     client = cli_util.build_client('bds', 'bds', ctx)
     result = client.add_worker_nodes(
@@ -283,7 +295,11 @@ def add_worker_nodes(ctx, from_json, wait_for_state, max_wait_seconds, wait_inte
                 if wait_interval_seconds is not None:
                     wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
 
-                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                click.echo(
+                    f'Action completed. Waiting until the work request has entered state: {wait_for_state}',
+                    file=sys.stderr,
+                )
+
                 result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
             except oci.exceptions.MaximumWaitTimeExceeded as e:
                 # If we fail, we should show an error, but we should still provide the information to the customer
@@ -321,9 +337,7 @@ def change_bds_instance_compartment(ctx, from_json, wait_for_state, max_wait_sec
         kwargs['if_match'] = if_match
     kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
 
-    _details = {}
-    _details['compartmentId'] = compartment_id
-
+    _details = {'compartmentId': compartment_id}
     client = cli_util.build_client('bds', 'bds', ctx)
     result = client.change_bds_instance_compartment(
         bds_instance_id=bds_instance_id,
@@ -340,7 +354,11 @@ def change_bds_instance_compartment(ctx, from_json, wait_for_state, max_wait_sec
                 if wait_interval_seconds is not None:
                     wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
 
-                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                click.echo(
+                    f'Action completed. Waiting until the work request has entered state: {wait_for_state}',
+                    file=sys.stderr,
+                )
+
                 result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
             except oci.exceptions.MaximumWaitTimeExceeded as e:
                 # If we fail, we should show an error, but we should still provide the information to the customer
@@ -359,7 +377,7 @@ def change_bds_instance_compartment(ctx, from_json, wait_for_state, max_wait_sec
 @bds_instance_group.command(name=cli_util.override('bds.change_shape.command_name', 'change-shape'), help=u"""Changes the size of a cluster by scaling up or scaling down the nodes. Nodes are scaled up or down by changing the shapes of all the nodes of the same type to the next larger or smaller shape. The node types are master, utility, worker, and Cloud SQL. Only nodes with VM-STANDARD shapes can be scaled. \n[Command Reference](changeShape)""")
 @cli_util.option('--bds-instance-id', required=True, help=u"""The OCID of the cluster.""")
 @cli_util.option('--cluster-admin-password', required=True, help=u"""Base-64 encoded password for the cluster (and Cloudera Manager) admin user.""")
-@cli_util.option('--nodes', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--nodes', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=f"""{custom_types.cli_complex_type.COMPLEX_TYPE_HELP}""")
 @cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource. The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
 @cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "IN_PROGRESS", "FAILED", "SUCCEEDED", "CANCELING", "CANCELED"]), multiple=True, help="""This operation asynchronously creates, modifies or deletes a resource and uses a work request to track the progress of the operation. Specify this option to perform the action and then wait until the work request reaches a certain state. Multiple states can be specified, returning on the first state. For example, --wait-for-state SUCCEEDED --wait-for-state FAILED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
 @cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the work request to reach the state defined by --wait-for-state. Defaults to 1200 seconds.""")
@@ -379,9 +397,10 @@ def change_shape(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval
         kwargs['if_match'] = if_match
     kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
 
-    _details = {}
-    _details['clusterAdminPassword'] = cluster_admin_password
-    _details['nodes'] = cli_util.parse_json_parameter("nodes", nodes)
+    _details = {
+        'clusterAdminPassword': cluster_admin_password,
+        'nodes': cli_util.parse_json_parameter("nodes", nodes),
+    }
 
     client = cli_util.build_client('bds', 'bds', ctx)
     result = client.change_shape(
@@ -399,7 +418,11 @@ def change_shape(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval
                 if wait_interval_seconds is not None:
                     wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
 
-                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                click.echo(
+                    f'Action completed. Waiting until the work request has entered state: {wait_for_state}',
+                    file=sys.stderr,
+                )
+
                 result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
             except oci.exceptions.MaximumWaitTimeExceeded as e:
                 # If we fail, we should show an error, but we should still provide the information to the customer
